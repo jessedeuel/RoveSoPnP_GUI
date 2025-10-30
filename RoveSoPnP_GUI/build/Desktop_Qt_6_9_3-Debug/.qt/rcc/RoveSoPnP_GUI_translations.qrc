@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/i18n">
+    <file alias="RoveSoPnP_GUI_en_US.qm">/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_en_US.qm</file>
+  </qresource>
+</RCC>
+

@@ -1,0 +1,11 @@
+set(lupdate_project_file "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/CMakeLists.txt")
+set(lupdate_translations "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI_en_US.ts")
+set(lupdate_include_paths "")
+set(lupdate_sources "")
+set(lupdate_subproject_count 1)
+
+set(lupdate_subproject1_source_dir "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI")
+set(lupdate_subproject1_include_paths "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_autogen/include;/home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore;/home/jessedeuel/Qt/6.9.3/gcc_64/include;/home/jessedeuel/Qt/6.9.3/gcc_64/mkspecs/linux-g++;/home/jessedeuel/Qt/6.9.3/gcc_64/include;/home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets;/home/jessedeuel/Qt/6.9.3/gcc_64/include;/home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui;/home/jessedeuel/Qt/6.9.3/gcc_64/include;/usr/include;/usr/include;/usr/include;/usr/include")
+set(lupdate_subproject1_sources "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_autogen/mocs_compilation.cpp;main.cpp;mainwindow.cpp;mainwindow.h;mainwindow.ui;/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/.qt/rcc/RoveSoPnP_GUI_translations.qrc;/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_en_US.qm;/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/.qt/rcc/qrc_RoveSoPnP_GUI_translations.cpp;/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_autogen/include/ui_mainwindow.h;/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_autogen/timestamp;/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_en_US.qm.rule;/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/.qt/rcc/qrc_RoveSoPnP_GUI_translations.cpp.rule;/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_autogen/timestamp.rule")
+set(lupdate_subproject1_excluded "")
+set(lupdate_subproject1_autogen_dir "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_autogen")

@@ -1,0 +1,14 @@
+# ninja log v5
+2	16	1761851593513755560	RoveSoPnP_GUI_en_US.qm	c52be23cf95d8a28
+2	16	1761851593513755560	/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_en_US.qm	c52be23cf95d8a28
+2	209	1761851593702759318	RoveSoPnP_GUI_autogen/timestamp	dccb0e242151a191
+2	209	1761851593702759318	RoveSoPnP_GUI_autogen/mocs_compilation.cpp	dccb0e242151a191
+2	209	1761851593702759318	/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_autogen/timestamp	dccb0e242151a191
+2	209	1761851593702759318	/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI_autogen/mocs_compilation.cpp	dccb0e242151a191
+210	222	1761851593719759656	.qt/rcc/qrc_RoveSoPnP_GUI_translations.cpp	bc41bf8b14349e4
+210	222	1761851593719759656	/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/.qt/rcc/qrc_RoveSoPnP_GUI_translations.cpp	bc41bf8b14349e4
+223	279	1761851593770760670	CMakeFiles/RoveSoPnP_GUI.dir/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/.qt/rcc/qrc_RoveSoPnP_GUI_translations.cpp.o	fb6a5a26b6772732
+222	2020	1761851595502795103	CMakeFiles/RoveSoPnP_GUI.dir/RoveSoPnP_GUI_autogen/mocs_compilation.cpp.o	5c0988cff6880a2
+223	2074	1761851595557796196	CMakeFiles/RoveSoPnP_GUI.dir/mainwindow.cpp.o	c05bac66775a56da
+222	2080	1761851595561796276	CMakeFiles/RoveSoPnP_GUI.dir/main.cpp.o	3569373aa494d8f9
+2080	2396	1761851595884802697	RoveSoPnP_GUI	66fbf663b265e625
