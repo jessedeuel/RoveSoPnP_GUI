@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
             break;
         }
     }
+
     MainWindow w;
     w.resize(1200, 600);
     w.show();

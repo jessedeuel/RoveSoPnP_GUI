@@ -8,6 +8,9 @@
 #include <QWidget>
 #include <QTableWidget>
 #include <QTabWidget>
+#include <QtMultimedia/QCamera>
+#include <QtMultimedia/QMediaCaptureSession>
+#include <QtMultimediaWidgets/QVideoWidget>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -27,6 +30,7 @@ private:
     Ui::MainWindow *ui;
 
 private slots:
-    void onButtonClicked();
+    void onPauseButtonClicked();
+    void onEndProgramButtonClicked();
 };
 #endif // MAINWINDOW_H
