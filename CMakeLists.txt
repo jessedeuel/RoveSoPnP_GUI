@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.19)
 project(RoveSoPnP_GUI LANGUAGES CXX)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools)
+#set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
+
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "~/Qt/6.9.3/gcc_64")
 
 qt_standard_project_setup()
 

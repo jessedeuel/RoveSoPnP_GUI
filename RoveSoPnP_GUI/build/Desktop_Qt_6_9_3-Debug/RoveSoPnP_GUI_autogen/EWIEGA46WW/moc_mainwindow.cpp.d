@@ -7,6 +7,7 @@
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/q20type_traits.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/q20utility.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/q23utility.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qabstractitemmodel.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qalgorithms.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qanystringview.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qarraydata.h \
@@ -47,12 +48,15 @@
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qglobalstatic.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qhash.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qhashfunctions.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qiodevice.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qiodevicebase.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qitemselectionmodel.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qiterable.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qiterator.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qlatin1stringview.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qline.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qlist.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qlocale.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qlogging.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qmalloc.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qmap.h \
@@ -73,6 +77,7 @@
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qprocessordetection.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qrect.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qrefcount.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qregularexpression.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qscopedpointer.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qscopeguard.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qset.h \
@@ -119,6 +124,7 @@
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qtversionchecks.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qtypeinfo.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qtypes.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qurl.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qutf8stringview.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qvariant.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore/qvarlengtharray.h \
@@ -139,20 +145,49 @@
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qkeysequence.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qpaintdevice.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qpalette.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qpicture.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qpixelformat.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qpixmap.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qpolygon.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qregion.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qrgb.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qrgba64.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qtextdocument.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qtgui-config.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qtguiexports.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qtguiglobal.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qtransform.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qvalidator.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui/qwindowdefs.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/QLabel \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/QMainWindow \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/QPushButton \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/QTabWidget \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/QTableWidget \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/QVBoxLayout \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/QWidget \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qabstractbutton.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qabstractitemview.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qabstractslider.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qabstractspinbox.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qboxlayout.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qframe.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qgridlayout.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qlabel.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qlayout.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qlayoutitem.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qmainwindow.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qpushbutton.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qrubberband.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qsizepolicy.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qslider.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qstyle.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qstyleoption.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qtabbar.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qtableview.h \
+  /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qtablewidget.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qtabwidget.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qtwidgets-config.h \
   /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets/qtwidgetsexports.h \

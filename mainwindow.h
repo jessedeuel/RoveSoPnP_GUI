@@ -2,6 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QPushButton>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QWidget>
+#include <QTableWidget>
+#include <QTabWidget>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,5 +25,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+private slots:
+    void onButtonClicked();
 };
 #endif // MAINWINDOW_H

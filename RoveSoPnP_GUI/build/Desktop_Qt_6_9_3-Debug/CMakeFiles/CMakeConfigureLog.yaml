@@ -39,8 +39,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-1WIryd"
-      binary: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-1WIryd"
+      source: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-yJFt0x"
+      binary: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-yJFt0x"
     cmakeVariables:
       CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "/usr/bin/clang-scan-deps-14"
       CMAKE_CXX_FLAGS: "-DQT_QML_DEBUG"
@@ -51,10 +51,10 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: '/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-1WIryd'
+        Change Dir: '/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-yJFt0x'
         
-        Run Build Command(s): /usr/local/bin/ninja -v cmTC_d89ff
-        [1/2] /usr/lib/ccache/clang++-14   -DQT_QML_DEBUG    -v -MD -MT CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -c /home/jessedeuel/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp
+        Run Build Command(s): /usr/local/bin/ninja -v cmTC_80971
+        [1/2] /usr/lib/ccache/clang++-14   -DQT_QML_DEBUG    -v -MD -MT CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -c /home/jessedeuel/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp
         Ubuntu clang version 14.0.0-1ubuntu1.1
         Target: x86_64-pc-linux-gnu
         Thread model: posix
@@ -65,7 +65,7 @@ events:
         Candidate multilib: .;@m64
         Selected multilib: .;@m64
          (in-process)
-         "/usr/lib/llvm-14/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-1WIryd -resource-dir /usr/lib/llvm-14/lib/clang/14.0.0 -dependency-file CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -D QT_QML_DEBUG -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/x86_64-linux-gnu/c++/12 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/backward -internal-isystem /usr/lib/llvm-14/lib/clang/14.0.0/include -internal-isystem /usr/local/include -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-1WIryd -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -fcolor-diagnostics -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -x c++ /home/jessedeuel/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp
+         "/usr/lib/llvm-14/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-yJFt0x -resource-dir /usr/lib/llvm-14/lib/clang/14.0.0 -dependency-file CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -D QT_QML_DEBUG -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/x86_64-linux-gnu/c++/12 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/backward -internal-isystem /usr/lib/llvm-14/lib/clang/14.0.0/include -internal-isystem /usr/local/include -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-yJFt0x -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -fcolor-diagnostics -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -x c++ /home/jessedeuel/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp
         clang -cc1 version 14.0.0 based upon LLVM 14.0.0 default target x86_64-pc-linux-gnu
         ignoring nonexistent directory "/usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../x86_64-linux-gnu/include"
         ignoring nonexistent directory "/include"
@@ -79,7 +79,7 @@ events:
          /usr/include/x86_64-linux-gnu
          /usr/include
         End of search list.
-        [2/2] : && /usr/lib/ccache/clang++-14 -DQT_QML_DEBUG -v -Wl,-v CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_d89ff   && :
+        [2/2] : && /usr/lib/ccache/clang++-14 -DQT_QML_DEBUG -v -Wl,-v CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_80971   && :
         Ubuntu clang version 14.0.0-1ubuntu1.1
         Target: x86_64-pc-linux-gnu
         Thread model: posix
@@ -89,7 +89,7 @@ events:
         Selected GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/12
         Candidate multilib: .;@m64
         Selected multilib: .;@m64
-         "/usr/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_d89ff /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/12/crtbeginS.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/12 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/llvm-14/bin/../lib -L/lib -L/usr/lib -v CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/bin/../lib/gcc/x86_64-linux-gnu/12/crtendS.o /lib/x86_64-linux-gnu/crtn.o
+         "/usr/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_80971 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/12/crtbeginS.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/12 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/llvm-14/bin/../lib -L/lib -L/usr/lib -v CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/bin/../lib/gcc/x86_64-linux-gnu/12/crtendS.o /lib/x86_64-linux-gnu/crtn.o
         GNU ld (GNU Binutils for Ubuntu) 2.38
         
       exitCode: 0
@@ -131,10 +131,10 @@ events:
       Parsed CXX implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(\\.[a-z]+)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(\\.[a-z]+)?))("|,| |$)]
-        ignore line: [Change Dir: '/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-1WIryd']
+        ignore line: [Change Dir: '/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-yJFt0x']
         ignore line: []
-        ignore line: [Run Build Command(s): /usr/local/bin/ninja -v cmTC_d89ff]
-        ignore line: [[1/2] /usr/lib/ccache/clang++-14   -DQT_QML_DEBUG    -v -MD -MT CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -c /home/jessedeuel/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Run Build Command(s): /usr/local/bin/ninja -v cmTC_80971]
+        ignore line: [[1/2] /usr/lib/ccache/clang++-14   -DQT_QML_DEBUG    -v -MD -MT CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -c /home/jessedeuel/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp]
         ignore line: [Ubuntu clang version 14.0.0-1ubuntu1.1]
         ignore line: [Target: x86_64-pc-linux-gnu]
         ignore line: [Thread model: posix]
@@ -147,7 +147,7 @@ events:
         ignore line: [Selected multilib: .]
         ignore line: [@m64]
         ignore line: [ (in-process)]
-        ignore line: [ "/usr/lib/llvm-14/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-1WIryd -resource-dir /usr/lib/llvm-14/lib/clang/14.0.0 -dependency-file CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -D QT_QML_DEBUG -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/x86_64-linux-gnu/c++/12 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/backward -internal-isystem /usr/lib/llvm-14/lib/clang/14.0.0/include -internal-isystem /usr/local/include -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-1WIryd -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -fcolor-diagnostics -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -x c++ /home/jessedeuel/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [ "/usr/lib/llvm-14/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-yJFt0x -resource-dir /usr/lib/llvm-14/lib/clang/14.0.0 -dependency-file CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -D QT_QML_DEBUG -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/x86_64-linux-gnu/c++/12 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/backward -internal-isystem /usr/lib/llvm-14/lib/clang/14.0.0/include -internal-isystem /usr/local/include -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-yJFt0x -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -fcolor-diagnostics -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -x c++ /home/jessedeuel/Qt/Tools/CMake/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp]
         ignore line: [clang -cc1 version 14.0.0 based upon LLVM 14.0.0 default target x86_64-pc-linux-gnu]
         ignore line: [ignoring nonexistent directory "/usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../x86_64-linux-gnu/include"]
         ignore line: [ignoring nonexistent directory "/include"]
@@ -161,7 +161,7 @@ events:
         ignore line: [ /usr/include/x86_64-linux-gnu]
         ignore line: [ /usr/include]
         ignore line: [End of search list.]
-        ignore line: [[2/2] : && /usr/lib/ccache/clang++-14 -DQT_QML_DEBUG -v -Wl -v CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_d89ff   && :]
+        ignore line: [[2/2] : && /usr/lib/ccache/clang++-14 -DQT_QML_DEBUG -v -Wl -v CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_80971   && :]
         ignore line: [Ubuntu clang version 14.0.0-1ubuntu1.1]
         ignore line: [Target: x86_64-pc-linux-gnu]
         ignore line: [Thread model: posix]
@@ -173,7 +173,7 @@ events:
         ignore line: [@m64]
         ignore line: [Selected multilib: .]
         ignore line: [@m64]
-        link line: [ "/usr/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_d89ff /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/12/crtbeginS.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/12 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/llvm-14/bin/../lib -L/lib -L/usr/lib -v CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/bin/../lib/gcc/x86_64-linux-gnu/12/crtendS.o /lib/x86_64-linux-gnu/crtn.o]
+        link line: [ "/usr/bin/ld" -pie -z relro --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_80971 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/12/crtbeginS.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/12 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/llvm-14/bin/../lib -L/lib -L/usr/lib -v CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/bin/../lib/gcc/x86_64-linux-gnu/12/crtendS.o /lib/x86_64-linux-gnu/crtn.o]
           arg [/usr/bin/ld] ==> ignore
           arg [-pie] ==> ignore
           arg [-zrelro] ==> ignore
@@ -185,7 +185,7 @@ events:
           arg [-dynamic-linker] ==> ignore
           arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
           arg [-o] ==> ignore
-          arg [cmTC_d89ff] ==> ignore
+          arg [cmTC_80971] ==> ignore
           arg [/lib/x86_64-linux-gnu/Scrt1.o] ==> obj [/lib/x86_64-linux-gnu/Scrt1.o]
           arg [/lib/x86_64-linux-gnu/crti.o] ==> obj [/lib/x86_64-linux-gnu/crti.o]
           arg [/usr/bin/../lib/gcc/x86_64-linux-gnu/12/crtbeginS.o] ==> obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/12/crtbeginS.o]
@@ -199,7 +199,7 @@ events:
           arg [-L/lib] ==> dir [/lib]
           arg [-L/usr/lib] ==> dir [/usr/lib]
           arg [-v] ==> ignore
-          arg [CMakeFiles/cmTC_d89ff.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [CMakeFiles/cmTC_80971.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
           arg [-lstdc++] ==> lib [stdc++]
           arg [-lm] ==> lib [m]
           arg [-lgcc_s] ==> lib [gcc_s]
@@ -256,8 +256,8 @@ events:
       - "RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/.qtc/package-manager/maintenance_tool_provider.cmake:315 (find_package)"
       - "CMakeLists.txt:4 (find_package)"
     directories:
-      source: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-s1t1kV"
-      binary: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-s1t1kV"
+      source: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-6ylPkN"
+      binary: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-6ylPkN"
     cmakeVariables:
       CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "/usr/bin/clang-scan-deps-14"
       CMAKE_CXX_FLAGS: "-DQT_QML_DEBUG"
@@ -268,11 +268,11 @@ events:
       variable: "CMAKE_HAVE_LIBC_PTHREAD"
       cached: true
       stdout: |
-        Change Dir: '/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-s1t1kV'
+        Change Dir: '/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-6ylPkN'
         
-        Run Build Command(s): /usr/local/bin/ninja -v cmTC_f0c4f
-        [1/2] /usr/lib/ccache/clang++-14 -DCMAKE_HAVE_LIBC_PTHREAD  -DQT_QML_DEBUG -MD -MT CMakeFiles/cmTC_f0c4f.dir/src.cxx.o -MF CMakeFiles/cmTC_f0c4f.dir/src.cxx.o.d -o CMakeFiles/cmTC_f0c4f.dir/src.cxx.o -c /home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-s1t1kV/src.cxx
-        [2/2] : && /usr/lib/ccache/clang++-14 -DQT_QML_DEBUG  CMakeFiles/cmTC_f0c4f.dir/src.cxx.o -o cmTC_f0c4f   && :
+        Run Build Command(s): /usr/local/bin/ninja -v cmTC_5abb6
+        [1/2] /usr/lib/ccache/clang++-14 -DCMAKE_HAVE_LIBC_PTHREAD  -DQT_QML_DEBUG -MD -MT CMakeFiles/cmTC_5abb6.dir/src.cxx.o -MF CMakeFiles/cmTC_5abb6.dir/src.cxx.o.d -o CMakeFiles/cmTC_5abb6.dir/src.cxx.o -c /home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-6ylPkN/src.cxx
+        [2/2] : && /usr/lib/ccache/clang++-14 -DQT_QML_DEBUG  CMakeFiles/cmTC_5abb6.dir/src.cxx.o -o cmTC_5abb6   && :
         
       exitCode: 0
   -
@@ -291,8 +291,8 @@ events:
     checks:
       - "Performing Test HAVE_STDATOMIC"
     directories:
-      source: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-FV2Gzg"
-      binary: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-FV2Gzg"
+      source: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-rHK0cZ"
+      binary: "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-rHK0cZ"
     cmakeVariables:
       CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "/usr/bin/clang-scan-deps-14"
       CMAKE_CXX_FLAGS: "-DQT_QML_DEBUG"
@@ -303,11 +303,11 @@ events:
       variable: "HAVE_STDATOMIC"
       cached: true
       stdout: |
-        Change Dir: '/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-FV2Gzg'
+        Change Dir: '/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-rHK0cZ'
         
-        Run Build Command(s): /usr/local/bin/ninja -v cmTC_1702c
-        [1/2] /usr/lib/ccache/clang++-14 -DHAVE_STDATOMIC  -DQT_QML_DEBUG -MD -MT CMakeFiles/cmTC_1702c.dir/src.cxx.o -MF CMakeFiles/cmTC_1702c.dir/src.cxx.o.d -o CMakeFiles/cmTC_1702c.dir/src.cxx.o -c /home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-FV2Gzg/src.cxx
-        [2/2] : && /usr/lib/ccache/clang++-14 -DQT_QML_DEBUG  CMakeFiles/cmTC_1702c.dir/src.cxx.o -o cmTC_1702c   && :
+        Run Build Command(s): /usr/local/bin/ninja -v cmTC_d8884
+        [1/2] /usr/lib/ccache/clang++-14 -DHAVE_STDATOMIC  -DQT_QML_DEBUG -MD -MT CMakeFiles/cmTC_d8884.dir/src.cxx.o -MF CMakeFiles/cmTC_d8884.dir/src.cxx.o.d -o CMakeFiles/cmTC_d8884.dir/src.cxx.o -c /home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/CMakeFiles/CMakeScratch/TryCompile-rHK0cZ/src.cxx
+        [2/2] : && /usr/lib/ccache/clang++-14 -DQT_QML_DEBUG  CMakeFiles/cmTC_d8884.dir/src.cxx.o -o cmTC_d8884   && :
         
       exitCode: 0
 ...
