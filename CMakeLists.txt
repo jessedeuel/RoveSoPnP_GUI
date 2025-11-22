@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.10)
 project(RoveSoPnP_GUI LANGUAGES CXX)
 
 #set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "~/Qt/6.9.3/gcc_64")
+#find_package(CppLinuxSerial CONFIG REQUIRED HINTS "~/Documents/Misc/CppLinuxSerial")
 
 qt_standard_project_setup()
 
@@ -23,9 +24,14 @@ target_link_libraries(RoveSoPnP_GUI
     PRIVATE
         Qt::Core
         Qt::Widgets
+        #CppLinuxSerial::CppLinuxSerial
 )
 
 include(GNUInstallDirs)
+
+target_include_directories(RoveSoPnP_GUI PUBLIC serial/include/)
+
+#target_link_libraries(RoveSoPnP_GUI PRIVATE )
 
 install(TARGETS RoveSoPnP_GUI
     BUNDLE  DESTINATION .

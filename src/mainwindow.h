@@ -12,6 +12,9 @@
 #include <QMenuBar>
 #include <QtMultimedia/QMediaCaptureSession>
 #include <QtMultimediaWidgets/QVideoWidget>
+#include <QComboBox>
+
+#include "serial/serial.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -33,5 +36,7 @@ private:
 private slots:
     void onPauseButtonClicked();
     void onEndProgramButtonClicked();
+    void onComPortSelectionBoxSelected();
+    void onComPortSetButtonClicked();
 };
 #endif // MAINWINDOW_H

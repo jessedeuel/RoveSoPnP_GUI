@@ -4,3 +4,6 @@
 [submodule "RoveSoPnP_FlowControl"]
 	path = RoveSoPnP_FlowControl
 	url = https://github.com/Vexas5266/RoveSoPnP_FlowControl.git
+[submodule "serial"]
+	path = serial
+	url = https://github.com/wjwwood/serial.git

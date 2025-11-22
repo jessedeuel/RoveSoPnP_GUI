@@ -45,13 +45,21 @@ MainWindow::MainWindow(QWidget *parent):
     QGridLayout *operatorPageLayout = new QGridLayout();
     operatorPage->setLayout(operatorPageLayout);
     QPushButton *runJobButton = new QPushButton("Run Job", this);
-    
     operatorPageLayout->addWidget(runJobButton);
+
+    QWidget *settingsPage = new QWidget();
+    QGridLayout *settingsPageLayout = new QGridLayout();
+    settingsPage->setLayout(settingsPageLayout);
+    QComboBox *comPortSelectionBox = new QComboBox();
+    QPushButton *comPortSetButton = new QPushButton("Set");
+    settingsPageLayout->addWidget(comPortSelectionBox, 0, 0);
+    settingsPageLayout->addWidget(comPortSetButton, 0, 1);
 
     QGridLayout *mainLayout = new QGridLayout();
     QTabWidget *tabs = new QTabWidget();
     tabs->addTab(jobsPage, "Jobs");
     tabs->addTab(operatorPage, "Operation");
+    tabs->addTab(settingsPage, "Settings");
 
     mainLayout->addWidget(menuBar, 0, 0, 1, 2);
     mainLayout->addLayout(sideBarLayout, 1, 0);
@@ -66,6 +74,8 @@ MainWindow::MainWindow(QWidget *parent):
 
     connect(pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
     connect(endProgramButton, &QPushButton::clicked, this, &MainWindow::onEndProgramButtonClicked);
+    connect(comPortSelectionBox, &QComboBox::activated, this, &MainWindow::onComPortSelectionBoxSelected);
+    connect(comPortSetButton, &QPushButton::clicked, this, &MainWindow::onComPortSetButtonClicked);
 }
 
 void MainWindow::onPauseButtonClicked()
@@ -88,6 +98,17 @@ void MainWindow::onEndProgramButtonClicked()
         endProgramButton->setStyleSheet("background-color: red;");
         endProgramButton->setText("End Program");
     }
+}
+
+
+void MainWindow::onComPortSelectionBoxSelected()
+{
+    
+}
+
+void MainWindow::onComPortSetButtonClicked()
+{
+
 }
 
 MainWindow::~MainWindow()
