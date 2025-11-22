@@ -79,4 +79,4 @@ CMakeLists.txt.user*
 .pch/
 .rcc/
 .uic/
-RoveSoPnP_GUI/build*/
+build/
