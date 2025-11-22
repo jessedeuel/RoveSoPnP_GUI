@@ -9,10 +9,9 @@ qt_standard_project_setup()
 
 qt_add_executable(RoveSoPnP_GUI
     WIN32 MACOSX_BUNDLE
-    main.cpp
-    mainwindow.cpp
-    mainwindow.h
-    mainwindow.ui
+    src/main.cpp
+    src/mainwindow.cpp
+    src/mainwindow.h
 )
 
 qt_add_translations(
