@@ -1,0 +1,6 @@
+[submodule "RoveSoPnP_Vision"]
+	path = RoveSoPnP_Vision
+	url = https://github.com/ClayJay3/RoveSoPnP_Vision.git
+[submodule "RoveSoPnP_FlowControl"]
+	path = RoveSoPnP_FlowControl
+	url = https://github.com/Vexas5266/RoveSoPnP_FlowControl.git

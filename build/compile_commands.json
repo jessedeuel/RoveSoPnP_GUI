@@ -1,0 +1,26 @@
+[
+{
+  "directory": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build",
+  "command": "/usr/bin/g++-12 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -I/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/RoveSoPnP_GUI_autogen/include -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/mkspecs/linux-g++ -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui -g -fPIC -o CMakeFiles/RoveSoPnP_GUI.dir/RoveSoPnP_GUI_autogen/mocs_compilation.cpp.o -c /home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/RoveSoPnP_GUI_autogen/mocs_compilation.cpp",
+  "file": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/RoveSoPnP_GUI_autogen/mocs_compilation.cpp",
+  "output": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/CMakeFiles/RoveSoPnP_GUI.dir/RoveSoPnP_GUI_autogen/mocs_compilation.cpp.o"
+},
+{
+  "directory": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build",
+  "command": "/usr/bin/g++-12 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -I/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/RoveSoPnP_GUI_autogen/include -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/mkspecs/linux-g++ -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui -g -fPIC -o CMakeFiles/RoveSoPnP_GUI.dir/src/main.cpp.o -c /home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/src/main.cpp",
+  "file": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/src/main.cpp",
+  "output": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/CMakeFiles/RoveSoPnP_GUI.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build",
+  "command": "/usr/bin/g++-12 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -I/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/RoveSoPnP_GUI_autogen/include -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/mkspecs/linux-g++ -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui -g -fPIC -o CMakeFiles/RoveSoPnP_GUI.dir/src/mainwindow.cpp.o -c /home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/src/mainwindow.cpp",
+  "file": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/src/mainwindow.cpp",
+  "output": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/CMakeFiles/RoveSoPnP_GUI.dir/src/mainwindow.cpp.o"
+},
+{
+  "directory": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build",
+  "command": "/usr/bin/g++-12 -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -I/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/RoveSoPnP_GUI_autogen/include -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtCore -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/mkspecs/linux-g++ -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtWidgets -isystem /home/jessedeuel/Qt/6.9.3/gcc_64/include/QtGui -g -fPIC -o CMakeFiles/RoveSoPnP_GUI.dir/build/.qt/rcc/qrc_RoveSoPnP_GUI_translations.cpp.o -c /home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/.qt/rcc/qrc_RoveSoPnP_GUI_translations.cpp",
+  "file": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/.qt/rcc/qrc_RoveSoPnP_GUI_translations.cpp",
+  "output": "/home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/build/CMakeFiles/RoveSoPnP_GUI.dir/build/.qt/rcc/qrc_RoveSoPnP_GUI_translations.cpp.o"
+}
+]

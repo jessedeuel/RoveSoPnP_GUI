@@ -1,2 +1,0 @@
-set(__QT_DEPLOY_TARGET_RoveSoPnP_GUI_FILE /home/jessedeuel/Documents/Misc/RoveSoPnP_GUI/RoveSoPnP_GUI/build/Desktop_Qt_6_9_3-Debug/RoveSoPnP_GUI)
-set(__QT_DEPLOY_TARGET_RoveSoPnP_GUI_TYPE EXECUTABLE)
