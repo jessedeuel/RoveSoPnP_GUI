@@ -21,12 +21,12 @@ add_subdirectory(RoveSoPnP_FlowControl)
 add_subdirectory(RoveSoPnP_Vision)
 #add_library(RoveSoPnP_Vision STATIC RoveSoPnP_Vision/src/main.cpp)
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/interfaces
-        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/util
-        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/vision
-)
+#target_include_directories(${PROJECT_NAME} PRIVATE
+#        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src
+#        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/interfaces
+#        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/util
+#        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/vision
+#)
 
 target_link_libraries(RoveSoPnP_GUI
     PRIVATE
@@ -34,7 +34,6 @@ target_link_libraries(RoveSoPnP_GUI
         Qt::Widgets
         RoveSoPnP_FlowControl
         RoveSoPnP_Vision
-        #CppLinuxSerial::CppLinuxSerial
 )
 
 include(GNUInstallDirs)
