@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#define _GLIBCXX_USE_CXX11_ABI 0
+
 #include <QMainWindow>
 #include <QPushButton>
 #include <QLabel>
@@ -14,7 +16,12 @@
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QComboBox>
 
+#include <cstdio>
+#include <memory>
+#include <vector>
+
 #include "serial/serial.h"
+#include "pnp.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -32,11 +39,12 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QList<QString> listPorts();
+
 
 private slots:
     void onPauseButtonClicked();
     void onEndProgramButtonClicked();
-    void onComPortSelectionBoxSelected();
     void onComPortSetButtonClicked();
 };
 #endif // MAINWINDOW_H

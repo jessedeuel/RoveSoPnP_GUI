@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(RoveSoPnP_GUI LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 
@@ -24,6 +26,7 @@ target_link_libraries(RoveSoPnP_GUI
     PRIVATE
         Qt::Core
         Qt::Widgets
+        
         #CppLinuxSerial::CppLinuxSerial
 )
 
@@ -45,3 +48,4 @@ qt_generate_deploy_app_script(
     NO_UNSUPPORTED_PLATFORM_ERROR
 )
 install(SCRIPT ${deploy_script})
+

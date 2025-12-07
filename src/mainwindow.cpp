@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "serial/serial.h"
 
 MainWindow::MainWindow(QWidget *parent): 
     QMainWindow(parent)
@@ -51,9 +52,13 @@ MainWindow::MainWindow(QWidget *parent):
     QGridLayout *settingsPageLayout = new QGridLayout();
     settingsPage->setLayout(settingsPageLayout);
     QComboBox *comPortSelectionBox = new QComboBox();
-    QPushButton *comPortSetButton = new QPushButton("Set");
+
+    QList<QString> ports = MainWindow::listPorts();
+    comPortSelectionBox->addItems(ports);
+
+    QPushButton *comPortConnectButton = new QPushButton("Connect");
     settingsPageLayout->addWidget(comPortSelectionBox, 0, 0);
-    settingsPageLayout->addWidget(comPortSetButton, 0, 1);
+    settingsPageLayout->addWidget(comPortConnectButton, 0, 1);
 
     QGridLayout *mainLayout = new QGridLayout();
     QTabWidget *tabs = new QTabWidget();
@@ -69,18 +74,49 @@ MainWindow::MainWindow(QWidget *parent):
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
 
-    qDebug() << "Test";
     //camera->start();
 
     connect(pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
     connect(endProgramButton, &QPushButton::clicked, this, &MainWindow::onEndProgramButtonClicked);
-    connect(comPortSelectionBox, &QComboBox::activated, this, &MainWindow::onComPortSelectionBoxSelected);
-    connect(comPortSetButton, &QPushButton::clicked, this, &MainWindow::onComPortSetButtonClicked);
+    connect(comPortConnectButton, &QPushButton::clicked, this, &MainWindow::onComPortSetButtonClicked);
+}
+
+QList<QString> MainWindow::listPorts()
+{
+    
+    QList<QString> result;
+    
+    std::array<char, 128> buffer;
+    
+    #ifdef __linux__
+    FILE* pipe = popen("ls /dev/tty*", "r"); // Open pipe for reading
+    if (!pipe) {
+        qFatal("Error: popen() failed!");
+    }
+    else
+    {
+        qDebug("popen() succeeded!");
+        while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+            result.push_back((QString)buffer.data());
+        }
+    }
+    pclose(pipe); // Close the pipe
+    for (QString& str : result)
+    {
+        qDebug("%s", str);
+    }
+    #elif __windows__
+    
+    qDebug("On Windows");
+    
+    #endif
+
+    return result;
 }
 
 void MainWindow::onPauseButtonClicked()
 {
-    //findChild<QLabel*>("label")->setText("Button Clicked!");
+    //findChild<QLabel*("label")->setText("Button Clicked!");
 }
 
 void MainWindow::onEndProgramButtonClicked()
@@ -101,14 +137,9 @@ void MainWindow::onEndProgramButtonClicked()
 }
 
 
-void MainWindow::onComPortSelectionBoxSelected()
-{
-    
-}
-
 void MainWindow::onComPortSetButtonClicked()
 {
-
+    
 }
 
 MainWindow::~MainWindow()
