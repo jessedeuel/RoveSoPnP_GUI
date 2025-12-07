@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.24.3)
 project(RoveSoPnP_GUI LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,18 +17,23 @@ qt_add_executable(RoveSoPnP_GUI
     src/mainwindow.h
 )
 
-qt_add_translations(
-    TARGETS RoveSoPnP_GUI
-    TS_FILES RoveSoPnP_GUI_en_US.ts
-)
-
 add_subdirectory(RoveSoPnP_FlowControl)
+add_subdirectory(RoveSoPnP_Vision)
+#add_library(RoveSoPnP_Vision STATIC RoveSoPnP_Vision/src/main.cpp)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/interfaces
+        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/util
+        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/vision
+)
 
 target_link_libraries(RoveSoPnP_GUI
     PRIVATE
         Qt::Core
         Qt::Widgets
         RoveSoPnP_FlowControl
+        RoveSoPnP_Vision
         #CppLinuxSerial::CppLinuxSerial
 )
 
