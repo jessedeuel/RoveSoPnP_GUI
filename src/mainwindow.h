@@ -20,8 +20,7 @@
 #include <memory>
 #include <vector>
 
-#include "serial/serial.h"
-#include "pnp.hpp"
+#include "comm.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -38,9 +37,12 @@ public:
     ~MainWindow();
 
 private:
+    Comm m_PNPMachineComm;
     Ui::MainWindow *ui;
-    QList<QString> listPorts();
 
+    QComboBox *comPortSelectionBox;
+
+    QList<QString> listPorts();
 
 private slots:
     void onPauseButtonClicked();

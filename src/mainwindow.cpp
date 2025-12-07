@@ -1,5 +1,6 @@
 #include "mainwindow.h"
-#include "serial/serial.h"
+#include <regex.h>
+#include <string.h>
 
 MainWindow::MainWindow(QWidget *parent): 
     QMainWindow(parent)
@@ -51,12 +52,13 @@ MainWindow::MainWindow(QWidget *parent):
     QWidget *settingsPage = new QWidget();
     QGridLayout *settingsPageLayout = new QGridLayout();
     settingsPage->setLayout(settingsPageLayout);
-    QComboBox *comPortSelectionBox = new QComboBox();
+    comPortSelectionBox = new QComboBox();
 
     QList<QString> ports = MainWindow::listPorts();
     comPortSelectionBox->addItems(ports);
 
     QPushButton *comPortConnectButton = new QPushButton("Connect");
+    comPortConnectButton->setObjectName("comPortConnectButton");
     settingsPageLayout->addWidget(comPortSelectionBox, 0, 0);
     settingsPageLayout->addWidget(comPortConnectButton, 0, 1);
 
@@ -97,13 +99,13 @@ QList<QString> MainWindow::listPorts()
     {
         qDebug("popen() succeeded!");
         while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
-            result.push_back((QString)buffer.data());
+            result.push_back(((QString)buffer.data()).trimmed());
         }
     }
     pclose(pipe); // Close the pipe
     for (QString& str : result)
     {
-        qDebug("%s", str);
+        qDebug("%s", str.toUtf8().constData());
     }
     #elif __windows__
     
@@ -139,7 +141,19 @@ void MainWindow::onEndProgramButtonClicked()
 
 void MainWindow::onComPortSetButtonClicked()
 {
-    
+    QPushButton* comPortConnectButton = findChild<QPushButton*>("comPortConnectButton");
+    m_PNPMachineComm = Comm();
+    QString comPortSelectionBoxText = comPortSelectionBox->currentText().trimmed();
+    QByteArray array = comPortSelectionBoxText.toLocal8Bit();
+    qDebug() << "|" << array.constData() << "|";
+    if (m_PNPMachineComm.setupComm(array.constData()) == false)
+    {
+        comPortConnectButton->setStyleSheet("background-color: red;");
+    }
+    else
+    {
+        comPortConnectButton->setStyleSheet("background-color: green;");
+    }
 }
 
 MainWindow::~MainWindow()

@@ -22,17 +22,17 @@ qt_add_translations(
     TS_FILES RoveSoPnP_GUI_en_US.ts
 )
 
+add_subdirectory(RoveSoPnP_FlowControl)
+
 target_link_libraries(RoveSoPnP_GUI
     PRIVATE
         Qt::Core
         Qt::Widgets
-        
+        RoveSoPnP_FlowControl
         #CppLinuxSerial::CppLinuxSerial
 )
 
 include(GNUInstallDirs)
-
-target_include_directories(RoveSoPnP_GUI PUBLIC serial/include/)
 
 #target_link_libraries(RoveSoPnP_GUI PRIVATE )
 
