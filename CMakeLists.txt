@@ -5,7 +5,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "~/Qt/6.9.3/gcc_64")
+if(DEFINED ENV{QT})
+    message(STATUS "QT is set to $ENV{QT}")
+else()
+    message(STATUS "QT environment variable is not set.")
+endif()
+
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "$ENV{QT}")
 #find_package(CppLinuxSerial CONFIG REQUIRED HINTS "~/Documents/Misc/CppLinuxSerial")
 
 qt_standard_project_setup()
