@@ -48,6 +48,7 @@ MainWindow::MainWindow(QWidget *parent):
     operatorPage->setLayout(operatorPageLayout);
     QPushButton *runJobButton = new QPushButton("Run Job", this);
     operatorPageLayout->addWidget(runJobButton);
+    // TODO: Add camera display
 
     QWidget *settingsPage = new QWidget();
     QGridLayout *settingsPageLayout = new QGridLayout();
@@ -81,6 +82,12 @@ MainWindow::MainWindow(QWidget *parent):
     connect(pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
     connect(endProgramButton, &QPushButton::clicked, this, &MainWindow::onEndProgramButtonClicked);
     connect(comPortConnectButton, &QPushButton::clicked, this, &MainWindow::onComPortSetButtonClicked);
+    connect(tabs, &QTabWidget::tabBarClicked, this, &MainWindow::onTabBarClicked);
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
 }
 
 QList<QString> MainWindow::listPorts()
@@ -156,7 +163,20 @@ void MainWindow::onComPortSetButtonClicked()
     }
 }
 
-MainWindow::~MainWindow()
+void onTabBarClicked(int index) 
 {
-    delete ui;
+    switch (index)
+    {
+    case 0:
+        QDebug("Pressed Jobs tab");
+        break;
+    case 1:
+        QDebug("Pressed Operator tab");
+        break;
+    case 2:
+        QDebug("Pressed Settings tab");
+        break;
+    default:
+        break;
+    }
 }
