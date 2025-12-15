@@ -11,7 +11,9 @@ else()
     message(STATUS "QT environment variable is not set.")
 endif()
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "$ENV{QT}")
+find_package(OpenCV REQUIRED) #HINTS ""
+
+find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "~/Qt/6.9.3/gcc_64") #$ENV{QT}
 #find_package(CppLinuxSerial CONFIG REQUIRED HINTS "~/Documents/Misc/CppLinuxSerial")
 
 qt_standard_project_setup()
@@ -31,6 +33,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/interfaces
         ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/util
         ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/vision
+        ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_FlowControl/include
+        ${OpenCV_INCLUDE_DIRS}
 )
 
 target_link_libraries(RoveSoPnP_GUI

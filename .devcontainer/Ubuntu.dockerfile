@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # Image Variables
 ARG UBUNTU_MAJOR="24"
 
@@ -66,9 +67,15 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     tzdata \
     ssh \
     gdb \ 
-    ninja-build 
- #   && \
- #   rm -rf /var/lib/apt/lists/*
+    ninja-build \
+    libxkbcommon-x11-0 \
+    libxcb-icccm4 \
+    libxcb-image0 \
+    libxcb-keysyms1 \
+    libxcb-render-util0 \
+    libxcb-shape0 \
+    && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set Timezone
 RUN echo "${TZ}" > /etc/localtime && \
@@ -116,15 +123,23 @@ RUN git clone --depth 1 --branch ${OPENCV_VERSION} https://github.com/opencv/ope
     rm -rf opencv_contrib && \
     rm -rf opencv
 
-RUN sudo apt install --no-install-recommends -y libxkbcommon-x11-0
+
+RUN --mount=type=secret,id=QT_PASSWD,env=QT_PASSWD \
+    --mount=type=secret,id=QT_EMAIL,env=QT_EMAIL \
+    #$(cat /run/secrets/QT_PASSWD) && \
+    #$(cat /run/secrets/QT_EMAIL) && \
+    wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run && \
+    chmod +x qt-online-installer-linux-x64-online.run && \
+    ./qt-online-installer-linux-x64-online.run --root ~/Qt --accept-licenses --accept-obligations \
+    --confirm-command --email ${QT_EMAIL} --pw ${QT_PASSWD} --accept-messages \
+    install qt6.9.3-sdk
 
 # Install Qt
-RUN wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run
-#https://download.qt.io/official_releases/qt/6.9/6.9.3/single/qt-everywhere-src-6.9.3.tar.xz
-#RUN tar -xf qt-everywhere-src-6.9.3.tar.xz
-RUN chmod +x qt-online-installer-linux-x64-online.run
-#RUN cd ./qt-everywhere-src-6.9.3
-RUN ./qt-online-installer-linux-x64-online.run --root ~/Qt/6.9.3 install qt.qt6.693.gcc_64 --accept-licenses --default-answer
+#RUN wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run
+#RUN chmod +x qt-online-installer-linux-x64-online.run
+#RUN ./qt-online-installer-linux-x64-online.run --root ~/Qt --accept-licenses --accept-obligations \
+#    --confirm-command --email ${[[/run/secret/QT_LOGIN ~= "QT_EMAIL=" ]]} --pw ${QT_PASSWD} --accept-messages \
+#    install qt6.9.3-sdk
 #RUN ./configure -prefix ./qtbase
 #RUN cmake -DBUILD_EXAMPLES=OFF .
 #RUN cmake --install .

@@ -35,14 +35,21 @@
         // "-e",
         // "XDG_RUNTIME_DIR", // Runtime directory for Wayland
         "-e",
-        "GDK_BACKEND=x11,wayland" // Allow GTK to work with both backends
+        "GDK_BACKEND=x11,wayland", // Allow GTK to work with both backends
     ],
     // Mount shared workspace volumes. Bind from host machine to container.
     "mounts": [
         "type=bind,readonly,source=/etc/localtime,target=/etc/localtime"
     ],
     "build": {
-        "dockerfile": "Ubuntu.dockerfile"
+        "dockerfile": "Ubuntu.dockerfile",
+        "options": [ 
+            "--progress=plain", 
+            "--secret",
+            "id=QT_EMAIL",
+            "--secret",
+            "id=QT_PASSWD"
+        ]
     },
     // Features to add to the dev container. More info: https://containers.dev/features.
     // "features": {},
