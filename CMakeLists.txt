@@ -3,26 +3,47 @@ project(RoveSoPnP_GUI LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
-
 if(DEFINED ENV{QT})
     message(STATUS "QT is set to $ENV{QT}")
 else()
     message(STATUS "QT environment variable is not set.")
 endif()
 
-find_package(OpenCV REQUIRED) #HINTS ""
+## Find Python3
+find_package(Python3 COMPONENTS Interpreter Development NumPy REQUIRED)
+
+## Find Threads
+find_package(Threads REQUIRED)
+
+## Find Quill
+find_package(quill REQUIRED)
+
+## Fine nlohmann JSON.
+find_package(nlohmann_json 3.2.0 REQUIRED)
+
+## Find Eigen3.
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
+# Find OpenCV
+find_package(OpenCV REQUIRED)
 
 find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "~/Qt/6.9.3/gcc_64") #$ENV{QT}
 #find_package(CppLinuxSerial CONFIG REQUIRED HINTS "~/Documents/Misc/CppLinuxSerial")
 
+####################################################################################################################
+##                                                Build Executable                                                ##
+####################################################################################################################
+
+# 1. Qt setup
 qt_standard_project_setup()
 
+# Gather source files
+file(GLOB_RECURSE EXE_SRC CONFIGURE_DEPENDS "src/*.cpp")
+
+# 2. Define executable
 qt_add_executable(RoveSoPnP_GUI
     WIN32 MACOSX_BUNDLE
-    src/main.cpp
-    src/mainwindow.cpp
-    src/mainwindow.h
+    ${EXE_SRC}
 )
 
 add_subdirectory(RoveSoPnP_FlowControl)
@@ -41,9 +62,21 @@ target_link_libraries(RoveSoPnP_GUI
     PRIVATE
         Qt::Core
         Qt::Widgets
-        RoveSoPnP_FlowControl
+        RoveFlowControl
         RoveVision
+        ${OpenCV_LIBS}
 )
+
+add_compile_definitions(BS_THREAD_POOL_ENABLE_PAUSE=1)
+add_compile_definitions(BS_THREAD_POOL_ENABLE_PRIORITY=1)
+add_compile_definitions(BS_THREAD_POOL_ENABLE_WAIT_DEADLOCK_CHECK=1)
+
+## 5. Compile Options
+if (MSVC)
+    target_compile_options(RoveVision PRIVATE /W4 /WX)
+else()
+    target_compile_options(RoveVision PRIVATE -Wall -Wextra -Wpedantic)
+endif()
 
 include(GNUInstallDirs)
 

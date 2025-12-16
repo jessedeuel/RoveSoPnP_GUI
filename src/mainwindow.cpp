@@ -2,8 +2,7 @@
 #include <regex.h>
 #include <string.h>
 
-MainWindow::MainWindow(QWidget *parent): 
-    QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     QMenuBar *menuBar = new QMenuBar();
     menuBar->addMenu("File");
@@ -33,7 +32,6 @@ MainWindow::MainWindow(QWidget *parent):
     sideBarLayout->addWidget(currentJobLabel);
     sideBarLayout->addWidget(pauseButton);
     sideBarLayout->addWidget(endProgramButton);
-
 
     QWidget *jobsPage = new QWidget();
     QGridLayout *jobsPageLayout = new QGridLayout();
@@ -77,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent):
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
 
-    //camera->start();
+    // camera->start();
 
     connect(pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
     connect(endProgramButton, &QPushButton::clicked, this, &MainWindow::onEndProgramButtonClicked);
@@ -92,63 +90,64 @@ MainWindow::~MainWindow()
 
 QList<QString> MainWindow::listPorts()
 {
-    
+
     QList<QString> result;
-    
+
     std::array<char, 128> buffer;
-    
-    #ifdef __linux__
-    FILE* pipe = popen("ls /dev/tty*", "r"); // Open pipe for reading
-    if (!pipe) {
+
+#ifdef __linux__
+    FILE *pipe = popen("ls /dev/tty*", "r"); // Open pipe for reading
+    if (!pipe)
+    {
         qFatal("Error: popen() failed!");
     }
     else
     {
         qDebug("popen() succeeded!");
-        while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+        while (fgets(buffer.data(), buffer.size(), pipe) != nullptr)
+        {
             result.push_back(((QString)buffer.data()).trimmed());
         }
     }
     pclose(pipe); // Close the pipe
-    for (QString& str : result)
+    for (QString &str : result)
     {
         qDebug("%s", str.toUtf8().constData());
     }
-    #elif __windows__
-    
+#elif __windows__
+
     qDebug("On Windows");
-    
-    #endif
+
+#endif
 
     return result;
 }
 
 void MainWindow::onPauseButtonClicked()
 {
-    //findChild<QLabel*("label")->setText("Button Clicked!");
+    // findChild<QLabel*("label")->setText("Button Clicked!");
 }
 
 void MainWindow::onEndProgramButtonClicked()
 {
     // If job not running set to green
-    QPushButton* endProgramButton = findChild<QPushButton*>("endProgramButton");
+    QPushButton *endProgramButton = findChild<QPushButton *>("endProgramButton");
     qDebug() << "Test";
     if (endProgramButton->styleSheet().contains("background-color: red;"))
     {
         endProgramButton->setStyleSheet("background-color: green;");
         endProgramButton->setText("Start Program");
     }
-    else 
+    else
     {
         endProgramButton->setStyleSheet("background-color: red;");
         endProgramButton->setText("End Program");
     }
 }
 
-
 void MainWindow::onComPortSetButtonClicked()
 {
-    QPushButton* comPortConnectButton = findChild<QPushButton*>("comPortConnectButton");
+    QPushButton *comPortConnectButton = findChild<QPushButton *>("comPortConnectButton");
     m_PNPMachineComm = Comm();
     QString comPortSelectionBoxText = comPortSelectionBox->currentText().trimmed();
     QByteArray array = comPortSelectionBoxText.toLocal8Bit();
@@ -163,18 +162,18 @@ void MainWindow::onComPortSetButtonClicked()
     }
 }
 
-void onTabBarClicked(int index) 
+void MainWindow::onTabBarClicked(int index)
 {
     switch (index)
     {
     case 0:
-        QDebug("Pressed Jobs tab");
+        qDebug() << "Pressed Jobs tab";
         break;
     case 1:
-        QDebug("Pressed Operator tab");
+        qDebug() << "Pressed Operator tab";
         break;
     case 2:
-        QDebug("Pressed Settings tab");
+        qDebug() << "Pressed Settings tab";
         break;
     default:
         break;
