@@ -74,6 +74,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     libxcb-keysyms1 \
     libxcb-render-util0 \
     libxcb-shape0 \
+    libxcb-cursor0 \
     && \
     rm -rf /var/lib/apt/lists/*
 
@@ -131,7 +132,7 @@ RUN --mount=type=secret,id=QT_PASSWD,env=QT_PASSWD \
     wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run && \
     chmod +x qt-online-installer-linux-x64-online.run && \
     ./qt-online-installer-linux-x64-online.run --root ~/Qt --accept-licenses --accept-obligations \
-    --confirm-command --email ${QT_EMAIL} --pw ${QT_PASSWD} --accept-messages \
+    --confirm-command --email ${QT_EMAIL} --pw ${QT_PASSWD} --accept-messages --essential \
     install qt6.9.3-sdk
 
 # Install Qt
