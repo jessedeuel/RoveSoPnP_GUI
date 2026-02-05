@@ -67,16 +67,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     tzdata \
     ssh \
     gdb \ 
-    ninja-build \
-    libxkbcommon-x11-0 \
-    libxcb-icccm4 \
-    libxcb-image0 \
-    libxcb-keysyms1 \
-    libxcb-render-util0 \
-    libxcb-shape0 \
-    libxcb-cursor0 \
-    && \
-    rm -rf /var/lib/apt/lists/*
+    ninja-build
 
 # Set Timezone
 RUN echo "${TZ}" > /etc/localtime && \
@@ -123,6 +114,19 @@ RUN git clone --depth 1 --branch ${OPENCV_VERSION} https://github.com/opencv/ope
     cd ../.. && \
     rm -rf opencv_contrib && \
     rm -rf opencv
+
+RUN apt-get install --no-install-recommends -y \
+    libxkbcommon-x11-0 \
+    libxcb-icccm4 \
+    libxcb-image0 \
+    libxcb-keysyms1 \
+    libxcb-render-util0 \
+    libxcb-shape0 \
+    libxcb-cursor0 \
+    libvulkan-dev \
+    vulkan-validationlayers \
+    spirv-tools \
+    vulkan-tools
 
 
 RUN --mount=type=secret,id=QT_PASSWD,env=QT_PASSWD \
