@@ -27,11 +27,11 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 # Find OpenCV
 find_package(OpenCV REQUIRED)
 
-find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "~/Qt/6.9.3/gcc_64") #$ENV{QT}
-#find_package(CppLinuxSerial CONFIG REQUIRED HINTS "~/Documents/Misc/CppLinuxSerial")
+find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "~/Qt/6.9.3/gcc_64")
 
 ####################################################################################################################
-##                                                Build Executable                                                ##
+##                                                Build Executable                           
+##
 ####################################################################################################################
 
 # 1. Qt setup
@@ -46,8 +46,9 @@ qt_add_executable(RoveSoPnP_GUI
     ${EXE_SRC}
 )
 
+# 3. Add Subdirectories
 add_subdirectory(RoveSoPnP_FlowControl)
-add_library(RoveVision STATIC RoveSoPnP_Vision)
+add_subdirectory(RoveSoPnP_Vision)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src
@@ -80,8 +81,6 @@ endif()
 
 include(GNUInstallDirs)
 
-#target_link_libraries(RoveSoPnP_GUI PRIVATE )
-
 install(TARGETS RoveSoPnP_GUI
     BUNDLE  DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -94,4 +93,3 @@ qt_generate_deploy_app_script(
     NO_UNSUPPORTED_PLATFORM_ERROR
 )
 install(SCRIPT ${deploy_script})
-

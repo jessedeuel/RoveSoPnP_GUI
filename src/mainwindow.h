@@ -1,8 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#define _GLIBCXX_USE_CXX11_ABI 0
-
 #include <QMainWindow>
 #include <QPushButton>
 #include <QLabel>
@@ -15,10 +13,12 @@
 #include <QtMultimedia/QMediaCaptureSession>
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QComboBox>
+#include <QTimer>
 
 #include <cstdio>
 #include <memory>
 #include <vector>
+#include <future>
 
 #include "comm.hpp"
 
@@ -31,8 +31,9 @@
 #include "vision/cameras/BasicCam.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
+namespace Ui
+{
+    class MainWindow;
 }
 QT_END_NAMESPACE
 
@@ -45,14 +46,19 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
+    // UI Elements
     QComboBox *comPortSelectionBox;
+    QLabel *m_pCameraDisplayLabel;
+    QTimer *m_pCameraTimer;
 
     // Comm and flow control member variables
     QList<QString> listPorts();
     Comm m_PNPMachineComm;
 
     // Vision member variables
+    cv::Mat m_currentFrame;
+    std::future<bool> m_frameReadyFuture;
+
     IPS m_IterPersecond;
     std::unique_ptr<BasicCam> m_pGantryCam;
     std::vector<uint32_t> m_vThreadFPSValue;
@@ -63,5 +69,6 @@ private slots:
     void onEndProgramButtonClicked();
     void onComPortSetButtonClicked();
     void onTabBarClicked(int index);
+    void updateCameraDisplay();
 };
 #endif // MAINWINDOW_H
