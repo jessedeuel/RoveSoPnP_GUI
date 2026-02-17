@@ -5,6 +5,9 @@
 #include <QPixmap>
 #include <iostream>
 #include <QDebug>
+#include <QTextEdit>
+#include <QPlainTextEdit>
+#include "jobsPage.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -39,13 +42,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     sideBarLayout->addWidget(pauseButton);
     sideBarLayout->addWidget(endProgramButton);
 
-    QWidget *jobsPage = new QWidget();
-    QGridLayout *jobsPageLayout = new QGridLayout();
-    jobsPage->setLayout(jobsPageLayout);
-    QTableWidget *table = new QTableWidget(10, 10);
-    jobsPageLayout->addWidget(table, 0, 0);
-    QPushButton *uploadJobButton = new QPushButton("Upload Job", this);
-    jobsPageLayout->addWidget(uploadJobButton, 1, 0);
+    jobsPage *jobsPage_instance = new jobsPage(this);
 
     QWidget *operatorPage = new QWidget();
     QGridLayout *operatorPageLayout = new QGridLayout();
@@ -85,6 +82,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(m_pCameraTimer, &QTimer::timeout, this, &MainWindow::updateCameraDisplay);
     m_pCameraTimer->start(33);
 
+    QTextEdit *gCodeEntryTextBox = new QTextEdit("Enter GCode", this);
+    QPushButton *gCodeSendButton = new QPushButton("Send GCode", this);
+    operatorPageLayout->addWidget(gCodeEntryTextBox);
+    operatorPageLayout->addWidget(gCodeSendButton);
+
     QWidget *settingsPage = new QWidget();
     QGridLayout *settingsPageLayout = new QGridLayout();
     settingsPage->setLayout(settingsPageLayout);
@@ -100,7 +102,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     QGridLayout *mainLayout = new QGridLayout();
     QTabWidget *tabs = new QTabWidget();
-    tabs->addTab(jobsPage, "Jobs");
+    tabs->addTab(jobsPage_instance, "Jobs");
     tabs->addTab(operatorPage, "Operation");
     tabs->addTab(settingsPage, "Settings");
 
@@ -116,6 +118,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(endProgramButton, &QPushButton::clicked, this, &MainWindow::onEndProgramButtonClicked);
     connect(comPortConnectButton, &QPushButton::clicked, this, &MainWindow::onComPortSetButtonClicked);
     connect(tabs, &QTabWidget::tabBarClicked, this, &MainWindow::onTabBarClicked);
+    connect(gCodeSendButton, &QPushButton::clicked, this, &MainWindow::onGCodeSendButtonClicked);
 
     qDebug() << "MainWindow initialized.";
 }
@@ -265,4 +268,10 @@ void MainWindow::onTabBarClicked(int index)
     default:
         break;
     }
+}
+
+void MainWindow::onGCodeSendButtonClicked()
+{
+    qDebug("GCode Send Button Clicked");
+
 }

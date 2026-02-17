@@ -47,10 +47,11 @@ qt_add_executable(RoveSoPnP_GUI
 )
 
 # 3. Add Subdirectories
-add_subdirectory(RoveSoPnP_FlowControl)
-add_subdirectory(RoveSoPnP_Vision)
+add_subdirectory(./libdeps/RoveSoPnP_FlowControl)
+add_subdirectory(./libdeps/RoveSoPnP_Vision)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src
         ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/interfaces
         ${CMAKE_CURRENT_SOURCE_DIR}/RoveSoPnP_Vision/src/util

@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include <QPushButton>
@@ -69,6 +68,6 @@ private slots:
     void onEndProgramButtonClicked();
     void onComPortSetButtonClicked();
     void onTabBarClicked(int index);
+    void onGCodeSendButtonClicked();
     void updateCameraDisplay();
 };
-#endif // MAINWINDOW_H

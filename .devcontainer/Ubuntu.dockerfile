@@ -129,11 +129,17 @@ RUN apt-get install --no-install-recommends -y \
     vulkan-tools
 
 
-RUN --mount=type=secret,id=QT_PASSWD,env=QT_PASSWD \
-    --mount=type=secret,id=QT_EMAIL,env=QT_EMAIL \
-    #$(cat /run/secrets/QT_PASSWD) && \
-    #$(cat /run/secrets/QT_EMAIL) && \
-    wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run && \
+ARG QT_EMAIL
+ENV QT_EMAIL=$QT_EMAIL
+ARG QT_PASSWD
+ENV QT_PASSWD=$QT_PASSWD
+
+#--mount=type=secret,id=QT_PASSWD,env=QT_PASSWD \
+#--mount=type=secret,id=QT_EMAIL,env=QT_EMAIL \
+RUN echo "Qt email: ${QT_EMAIL}"
+RUN echo "Qt passwd: ${QT_PASSWD}"
+
+RUN wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run && \
     chmod +x qt-online-installer-linux-x64-online.run && \
     ./qt-online-installer-linux-x64-online.run --root ~/Qt --accept-licenses --accept-obligations \
     --confirm-command --email ${QT_EMAIL} --pw ${QT_PASSWD} --accept-messages --essential \

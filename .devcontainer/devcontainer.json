@@ -35,12 +35,16 @@
     ],
     "build": {
         "dockerfile": "Ubuntu.dockerfile",
+        "args": {
+            "QT_EMAIL": "${localEnv:QT_EMAIL}",
+            "QT_PASSWD": "${localEnv:QT_PASSWD}"
+        },
         "options": [
-            "--progress=plain",
-            "--secret",
-            "id=QT_EMAIL",
-            "--secret",
-            "id=QT_PASSWD"
+            "--progress=plain"
+            // "-e",
+            // "QT_EMAIL",
+            // "-e",
+            // "QT_PASSWD"
         ]
     },
     // Features to add to the dev container. More info: https://containers.dev/features.
