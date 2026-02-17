@@ -42,7 +42,7 @@ void jobsPage::onUploadJobButtonClicked()
     dialog.setNameFilters(filters);
     dialog.setDirectory("./");
     //QString fileName = QFileDialog::getOpenFileName(this, tr("Open Image"), "./", );
-    connect(&dialog, &QFileDialog::fileSelected, this, [this](const QString &filePath) {
+    connect(&dialog, &QFileDialog::fileSelected, this, [&](const QString &filePath) mutable {
         qDebug() << "Selected file: " << filePath;
         m_currentJobTextEdit->setPlainText(filePath);
     });
