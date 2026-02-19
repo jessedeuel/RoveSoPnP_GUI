@@ -24,5 +24,5 @@ private:
     QTextEdit* m_currentJobTextEdit;
 
 private slots:
-    void onUploadJobButtonClicked();
+    
 };

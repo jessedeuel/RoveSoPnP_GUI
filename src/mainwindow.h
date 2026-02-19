@@ -40,6 +40,5 @@ private:
     Comm m_PNPMachineComm;
 
 private slots:
-    void onComPortSetButtonClicked();
     void onTabBarClicked(int index);
 };

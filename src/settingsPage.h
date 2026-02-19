@@ -2,6 +2,17 @@
 
 #include <QWidget>
 #include <QDebug>
+#include <QGridLayout>
+#include <QComboBox>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QFileDialog>
+#include <QFontMetrics>
+
+#include <memory.h>
+
+#include "pnp.hpp"
+#include "pnpRunner.h"
 
 class settingsPage : public QWidget
 {
@@ -11,16 +22,28 @@ public:
     settingsPage(QWidget *parent = nullptr);
     ~settingsPage();
     
-    QList<QString> settingsPage::listPorts()
+    QList<QString> listPorts();
+    
+    PnP* getPnPMachine();
+    int connectPnPMachine(QString comPort, QString csvFile);
 
 private:
-    QGridLayout* settingsPageLayout;
+    QGridLayout* m_pSettingsPageLayout;
     QComboBox* m_pComPortSelectionBox;
     QList<QString> m_lPorts;
     QPushButton* m_pComPortConnectButton;
+    QPushButton* m_pUploadJobButton;
+    QTextEdit* m_pCurrentJobTextEdit;
 
-    PnP m_PnPMachine
+    std::unique_ptr<PnPRunner> m_pPnPRunner;
+
+    std::string m_sJobFilePath;
+    std::string m_sComPort;
+
+    // TODO: Add thread for PnP ticking
+    // void PnPThreadHandler();
 
 private slots:
-
+    void onComPortSetButtonClicked();
+    void onUploadJobButtonClicked();
 };

@@ -23,12 +23,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     sideBar* sideBar_instance = new sideBar(this);
     jobsPage* jobsPage_instance = new jobsPage(this);
     operatorPage* operatorPage_instance = new operatorPage(this);
-    settingsPage* settingsPage = new settingsPage(this);
+    settingsPage* settingsPage_instance = new settingsPage(this);
 
     QTabWidget *tabs = new QTabWidget();
     tabs->addTab(jobsPage_instance, "Jobs");
     tabs->addTab(operatorPage_instance, "Operation");
-    tabs->addTab(settingsPage, "Settings");
+    tabs->addTab(settingsPage_instance, "Settings");
 
     mainLayout->addWidget(sideBar_instance, 0, 0);
     mainLayout->addWidget(tabs, 0, 1);

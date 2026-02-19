@@ -64,6 +64,7 @@ target_link_libraries(RoveSoPnP_GUI
     PRIVATE
         Qt::Core
         Qt::Widgets
+        Threads::Threads
         RoveFlowControl
         RoveVision
         ${OpenCV_LIBS}
