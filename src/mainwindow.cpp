@@ -8,41 +8,21 @@
 #include "jobsPage.h"
 #include "operatorPage.h"
 #include "customMenuBar.h"
+#include "sideBar.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     qDebug() << "Initializing MainWindow...";
 
+    QGridLayout *mainLayout = new QGridLayout();
+
     customMenuBar* menuBar_instance = new customMenuBar(this);
     this->setMenuBar(menuBar_instance);
-
-    QGridLayout *sideBarLayout = new QGridLayout();
-    QLabel *stateLabel = new QLabel("State: ", this);
-    stateLabel->setObjectName("stateLabel");
-    QLabel *connectionStatusLabel = new QLabel("Connection Status: ", this);
-    connectionStatusLabel->setObjectName("connectionStatus");
-    QLabel *positionLabel = new QLabel("Position: ", this);
-    positionLabel->setObjectName("positionLabel");
-    QLabel *currentComponentLabel = new QLabel("Current Component: ", this);
-    currentComponentLabel->setObjectName("currentComponentLabel");
-    QLabel *currentJobLabel = new QLabel("Current Job: ", this);
-    currentJobLabel->setObjectName("currentJobLabel");
-    QPushButton *pauseButton = new QPushButton("Pause", this);
-    pauseButton->setObjectName("pauseButton");
-    QPushButton *endProgramButton = new QPushButton("Start Program", this);
-    endProgramButton->setStyleSheet("background-color: green;");
-    endProgramButton->setObjectName("endProgramButton");
-
-    sideBarLayout->addWidget(stateLabel);
-    sideBarLayout->addWidget(connectionStatusLabel);
-    sideBarLayout->addWidget(positionLabel);
-    sideBarLayout->addWidget(currentComponentLabel);
-    sideBarLayout->addWidget(currentJobLabel);
-    sideBarLayout->addWidget(pauseButton);
-    sideBarLayout->addWidget(endProgramButton);
-
+    
+    sideBar* sideBar_instance = new sideBar(this);
     jobsPage* jobsPage_instance = new jobsPage(this);
     operatorPage* operatorPage_instance = new operatorPage();
+
 
     QWidget *settingsPage = new QWidget();
     QGridLayout *settingsPageLayout = new QGridLayout();
@@ -57,22 +37,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     settingsPageLayout->addWidget(comPortSelectionBox, 0, 0);
     settingsPageLayout->addWidget(comPortConnectButton, 0, 1);
 
-    QGridLayout *mainLayout = new QGridLayout();
     QTabWidget *tabs = new QTabWidget();
     tabs->addTab(jobsPage_instance, "Jobs");
     tabs->addTab(operatorPage_instance, "Operation");
     tabs->addTab(settingsPage, "Settings");
 
     //mainLayout->addWidget(menuBar, 0, 0, 1, 2);
-    mainLayout->addLayout(sideBarLayout, 1, 0);
-    mainLayout->addWidget(tabs, 1, 1);
+    mainLayout->addWidget(sideBar_instance, 0, 0);
+    mainLayout->addWidget(tabs, 0, 1);
 
     QWidget *centralWidget = new QWidget(this);
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
 
-    connect(pauseButton, &QPushButton::clicked, this, &MainWindow::onPauseButtonClicked);
-    connect(endProgramButton, &QPushButton::clicked, this, &MainWindow::onEndProgramButtonClicked);
     connect(comPortConnectButton, &QPushButton::clicked, this, &MainWindow::onComPortSetButtonClicked);
     connect(tabs, &QTabWidget::tabBarClicked, this, &MainWindow::onTabBarClicked);
 
@@ -109,27 +86,6 @@ QList<QString> MainWindow::listPorts()
 #endif
 
     return result;
-}
-
-void MainWindow::onPauseButtonClicked()
-{
-    // findChild<QLabel*("label")->setText("Button Clicked!");
-}
-
-void MainWindow::onEndProgramButtonClicked()
-{
-    QPushButton *endProgramButton = findChild<QPushButton *>("endProgramButton");
-    qDebug() << "EndProgramButton Clicked";
-    if (endProgramButton->styleSheet().contains("background-color: red;"))
-    {
-        endProgramButton->setStyleSheet("background-color: green;");
-        endProgramButton->setText("Start Program");
-    }
-    else
-    {
-        endProgramButton->setStyleSheet("background-color: red;");
-        endProgramButton->setText("End Program");
-    }
 }
 
 void MainWindow::onComPortSetButtonClicked()

@@ -40,8 +40,6 @@ private:
     Comm m_PNPMachineComm;
 
 private slots:
-    void onPauseButtonClicked();
-    void onEndProgramButtonClicked();
     void onComPortSetButtonClicked();
     void onTabBarClicked(int index);
 };

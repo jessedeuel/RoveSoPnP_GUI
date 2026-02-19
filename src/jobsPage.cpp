@@ -2,7 +2,6 @@
 
 jobsPage::jobsPage(QWidget *parent) : QWidget(parent)
 {
-    qDebug() << "jobsPage initialized.";
     m_jobsPageLayout = new QGridLayout();
     this->setLayout(m_jobsPageLayout);
 
@@ -21,6 +20,8 @@ jobsPage::jobsPage(QWidget *parent) : QWidget(parent)
     m_jobsPageLayout->addWidget(m_uploadJobButton, 1, 1);
 
     connect(m_uploadJobButton, &QPushButton::clicked, this, &jobsPage::onUploadJobButtonClicked);
+
+    qDebug() << "jobsPage initialized.";
 }
 
 jobsPage::~jobsPage()
