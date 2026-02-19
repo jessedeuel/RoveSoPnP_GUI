@@ -1,10 +1,7 @@
 #include "jobsPage.h"
 
-
 jobsPage::jobsPage(QWidget *parent) : QWidget(parent)
 {
-    //ui->setupUi(this);
-
     qDebug() << "jobsPage initialized.";
     m_jobsPageLayout = new QGridLayout();
     this->setLayout(m_jobsPageLayout);

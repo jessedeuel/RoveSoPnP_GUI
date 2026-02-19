@@ -8,7 +8,6 @@
 #include <QTableWidget>
 #include <QTabWidget>
 #include <QtMultimedia/QCamera>
-#include <QMenuBar>
 #include <QtMultimedia/QMediaCaptureSession>
 #include <QtMultimediaWidgets/QVideoWidget>
 #include <QComboBox>

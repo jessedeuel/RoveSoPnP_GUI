@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+
 #include <regex.h>
 #include <QDebug>
 #include <QTextEdit>
@@ -6,14 +7,14 @@
 
 #include "jobsPage.h"
 #include "operatorPage.h"
+#include "customMenuBar.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     qDebug() << "Initializing MainWindow...";
 
-    QMenuBar *menuBar = new QMenuBar();
-    menuBar->addMenu("File");
-    menuBar->addMenu("Edit");
+    customMenuBar* menuBar_instance = new customMenuBar(this);
+    this->setMenuBar(menuBar_instance);
 
     QGridLayout *sideBarLayout = new QGridLayout();
     QLabel *stateLabel = new QLabel("State: ", this);
@@ -62,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     tabs->addTab(operatorPage_instance, "Operation");
     tabs->addTab(settingsPage, "Settings");
 
-    mainLayout->addWidget(menuBar, 0, 0, 1, 2);
+    //mainLayout->addWidget(menuBar, 0, 0, 1, 2);
     mainLayout->addLayout(sideBarLayout, 1, 0);
     mainLayout->addWidget(tabs, 1, 1);
 
