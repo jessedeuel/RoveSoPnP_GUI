@@ -22,7 +22,6 @@ jobsPage::jobsPage(QWidget *parent) : QWidget(parent)
     //currentJobTextEdit->setMaximumBlockCount(1);
     m_jobsPageLayout->addWidget(m_currentJobTextEdit, 1, 0);
     m_jobsPageLayout->addWidget(m_uploadJobButton, 1, 1);
-    //jobsPageLayout->setRowStretch(0, 5); // Set row zero to be three times the size of a row with stretch 1
 
     connect(m_uploadJobButton, &QPushButton::clicked, this, &jobsPage::onUploadJobButtonClicked);
 }

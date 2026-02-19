@@ -1,13 +1,11 @@
 #include "mainwindow.h"
 #include <regex.h>
-#include <string.h>
-#include <QImage>
-#include <QPixmap>
-#include <iostream>
 #include <QDebug>
 #include <QTextEdit>
 #include <QPlainTextEdit>
+
 #include "jobsPage.h"
+#include "operatorPage.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -42,50 +40,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     sideBarLayout->addWidget(pauseButton);
     sideBarLayout->addWidget(endProgramButton);
 
-    jobsPage *jobsPage_instance = new jobsPage(this);
-
-    QWidget *operatorPage = new QWidget();
-    QGridLayout *operatorPageLayout = new QGridLayout();
-    operatorPage->setLayout(operatorPageLayout);
-    QPushButton *runJobButton = new QPushButton("Run Job", this);
-    operatorPageLayout->addWidget(runJobButton);
-
-    // Camera Display Setup
-    m_pCameraDisplayLabel = new QLabel("Camera Feed Loading...", this);
-    m_pCameraDisplayLabel->setObjectName("cameraDisplayLabel");
-    m_pCameraDisplayLabel->setMinimumSize(640, 480);
-    m_pCameraDisplayLabel->setAlignment(Qt::AlignCenter);
-    m_pCameraDisplayLabel->setStyleSheet("border: 1px solid black; background-color: #333; color: white;");
-    operatorPageLayout->addWidget(m_pCameraDisplayLabel);
-
-    // Camera Initialization
-    qDebug() << "Attempting to open camera /dev/video0...";
-    try
-    {
-        // Initialize BasicCam (device 0, 640x480, 30FPS)
-        m_pGantryCam = std::make_unique<BasicCam>("/dev/video0", 640, 480, 30, PIXEL_FORMATS::eBGR, 90.0, 90.0, false, 1);
-        m_pGantryCam->Start();
-        qDebug() << "Camera started successfully.";
-    }
-    catch (const std::exception &e)
-    {
-        qDebug() << "CRITICAL: Camera initialization failed:" << e.what();
-        m_pCameraDisplayLabel->setText("Camera Error: Initialization Failed");
-    }
-    catch (...)
-    {
-        qDebug() << "CRITICAL: Camera initialization failed with unknown error.";
-    }
-
-    // Start Timer to poll frames at ~30 FPS (33ms)
-    m_pCameraTimer = new QTimer(this);
-    connect(m_pCameraTimer, &QTimer::timeout, this, &MainWindow::updateCameraDisplay);
-    m_pCameraTimer->start(33);
-
-    QTextEdit *gCodeEntryTextBox = new QTextEdit("Enter GCode", this);
-    QPushButton *gCodeSendButton = new QPushButton("Send GCode", this);
-    operatorPageLayout->addWidget(gCodeEntryTextBox);
-    operatorPageLayout->addWidget(gCodeSendButton);
+    jobsPage* jobsPage_instance = new jobsPage(this);
+    operatorPage* operatorPage_instance = new operatorPage();
 
     QWidget *settingsPage = new QWidget();
     QGridLayout *settingsPageLayout = new QGridLayout();
@@ -103,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QGridLayout *mainLayout = new QGridLayout();
     QTabWidget *tabs = new QTabWidget();
     tabs->addTab(jobsPage_instance, "Jobs");
-    tabs->addTab(operatorPage, "Operation");
+    tabs->addTab(operatorPage_instance, "Operation");
     tabs->addTab(settingsPage, "Settings");
 
     mainLayout->addWidget(menuBar, 0, 0, 1, 2);
@@ -118,7 +74,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     connect(endProgramButton, &QPushButton::clicked, this, &MainWindow::onEndProgramButtonClicked);
     connect(comPortConnectButton, &QPushButton::clicked, this, &MainWindow::onComPortSetButtonClicked);
     connect(tabs, &QTabWidget::tabBarClicked, this, &MainWindow::onTabBarClicked);
-    connect(gCodeSendButton, &QPushButton::clicked, this, &MainWindow::onGCodeSendButtonClicked);
 
     qDebug() << "MainWindow initialized.";
 }
@@ -126,65 +81,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 MainWindow::~MainWindow()
 {
     qDebug() << "Destroying MainWindow...";
-    // Stop camera and thread pool safely before destruction
-    if (m_pGantryCam)
-    {
-        qDebug() << "Stopping Camera...";
-        m_pGantryCam->RequestStop();
-        m_pGantryCam->Join();
-    }
-}
-
-void MainWindow::updateCameraDisplay()
-{
-    // Safety check: verify camera exists and is running
-    if (!m_pGantryCam || m_pGantryCam->GetThreadState() != Thread<void>::ThreadState::eRunning)
-    {
-        return;
-    }
-
-    // 1. If we have no active request, make one.
-    if (!m_frameReadyFuture.valid())
-    {
-        m_frameReadyFuture = m_pGantryCam->RequestFrameCopy(m_currentFrame);
-        return; // Return and wait for next timer tick
-    }
-
-    // 2. If we have a request, check if it is ready (without blocking).
-    if (m_frameReadyFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
-    {
-        try
-        {
-            // Retrieve result
-            bool success = m_frameReadyFuture.get();
-
-            if (success && !m_currentFrame.empty())
-            {
-                // Convert OpenCV BGR to Qt RGB
-                cv::Mat rgbFrame;
-                cv::cvtColor(m_currentFrame, rgbFrame, cv::COLOR_BGR2RGB);
-
-                // Check for valid dimensions
-                if (rgbFrame.cols > 0 && rgbFrame.rows > 0)
-                {
-                    // Create QImage with deep copy to prevent segfaults
-                    QImage qimg((uchar *)rgbFrame.data, rgbFrame.cols, rgbFrame.rows, rgbFrame.step, QImage::Format_RGB888);
-                    m_pCameraDisplayLabel->setPixmap(QPixmap::fromImage(qimg.copy()));
-                }
-            }
-        }
-        catch (cv::Exception &e)
-        {
-            qDebug() << "OpenCV Error in updateCameraDisplay: " << e.what();
-        }
-        catch (...)
-        {
-            qDebug() << "Unknown Error in updateCameraDisplay";
-        }
-
-        // 3. Request the NEXT frame immediately
-        m_frameReadyFuture = m_pGantryCam->RequestFrameCopy(m_currentFrame);
-    }
 }
 
 QList<QString> MainWindow::listPorts()
@@ -268,10 +164,4 @@ void MainWindow::onTabBarClicked(int index)
     default:
         break;
     }
-}
-
-void MainWindow::onGCodeSendButtonClicked()
-{
-    qDebug("GCode Send Button Clicked");
-
 }
