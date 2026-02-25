@@ -11,7 +11,6 @@
 
 #include <memory.h>
 
-#include "pnp.hpp"
 #include "pnpRunner.h"
 
 class settingsPage : public QWidget
@@ -19,7 +18,7 @@ class settingsPage : public QWidget
     Q_OBJECT
 
 public:
-    settingsPage(QWidget *parent = nullptr);
+    settingsPage(std::shared_ptr<PnPRunner> pPnPRunner_instance, QWidget *parent = nullptr);
     ~settingsPage();
     
     QList<QString> listPorts();
@@ -35,7 +34,8 @@ private:
     QPushButton* m_pUploadJobButton;
     QTextEdit* m_pCurrentJobTextEdit;
 
-    std::unique_ptr<PnPRunner> m_pPnPRunner;
+    std::unique_ptr<PnPRunner> m_pPnPRunner_instance;
+    std::atomic<bool> m_bPnPThreadRunning;
 
     std::string m_sJobFilePath;
     std::string m_sComPort;

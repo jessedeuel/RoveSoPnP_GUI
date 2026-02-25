@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <atomic>
 
 #include "Thread.hpp"
 #include "pnp.hpp"
@@ -8,8 +9,11 @@
 class PnPRunner : public Thread<PnP>
 {
 public:
-    PnPRunner(std::string comPort = "", std::string csvFile = "");
+    PnPRunner(std::string comPort = "");
     ~PnPRunner();
+    
+    void Stop();
+    std::unique_ptr<PnP>& getPnPMachine() { return m_pPnPMachine; }
 
 private:
     std::string m_sComPort;

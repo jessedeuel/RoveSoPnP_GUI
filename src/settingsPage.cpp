@@ -1,6 +1,6 @@
 #include "settingsPage.h"
 
-settingsPage::settingsPage(QWidget *parent) : QWidget(parent)
+settingsPage::settingsPage(std::shared_ptr<PnPRunner> pPnPRunner_instance, QWidget *parent) : QWidget(parent)
 {
     m_pSettingsPageLayout = new QGridLayout();
     this->setLayout(m_pSettingsPageLayout);
@@ -42,7 +42,7 @@ QList<QString> settingsPage::listPorts()
     std::array<char, 128> buffer;
 
 #ifdef __linux__
-    FILE *pipe = popen("ls /dev/tty*", "r"); // Open pipe for reading
+    FILE *pipe = popen("ls /dev/ttyA*", "r"); // Open pipe for reading
     if (!pipe)
     {
         qDebug("Error: popen() failed!");
@@ -69,7 +69,6 @@ QList<QString> settingsPage::listPorts()
 
 int settingsPage::connectPnPMachine(QString comPort, QString csvFile)
 {
-    m_pPnPRunner = std::make_unique<PnPRunner>(comPort.toStdString(), csvFile.toStdString());
 
     return 0;
 }
@@ -81,16 +80,18 @@ void settingsPage::onComPortSetButtonClicked()
     m_sComPort = comPortSelectionBoxText.toStdString();
 
     qDebug() << "Connect Port: |" << m_sComPort.c_str() << "|";
-    /*
-    if (m_PNPMachineComm.setupComm(array.constData()) == false)
-    {
-        m_pComPortConnectButton->setStyleSheet("background-color: red;");
-    }
-    else
+
+    m_pPnPRunner_instance = std::make_unique<PnPRunner>(m_sComPort.c_str());
+
+
+    if (m_pPnPRunner_instance->getPnPMachine()->getState() == IDLE)
     {
         m_pComPortConnectButton->setStyleSheet("background-color: green;");
     }
-    */
+    else
+    {
+        m_pComPortConnectButton->setStyleSheet("background-color: red;");
+    }
 }
 
 void settingsPage::onUploadJobButtonClicked()

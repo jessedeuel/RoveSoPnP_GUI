@@ -6,12 +6,15 @@
 #include <QPushButton>
 #include <QDebug>
 
+#include <memory>
+#include "pnpRunner.h"
+
 class sideBar : public QWidget
 {
     Q_OBJECT
 
 public:
-    sideBar(QWidget *parent = nullptr);
+    sideBar(std::shared_ptr<PnPRunner> pPnPRunner_instance, QWidget *parent = nullptr);
     ~sideBar();
 
 private:
@@ -22,9 +25,9 @@ private:
     QLabel* m_pCurrentComponentLabel;
     QLabel* m_pCurrentJobLabel;
     QPushButton* m_pPauseButton;
-    QPushButton* m_pEndProgramButton;
+    QPushButton* m_pStartEndProgramButton;
 
 private slots:
     void onPauseButtonClicked();
-    void onEndProgramButtonClicked();
+    void onStartEndProgramButtonClicked();
 };

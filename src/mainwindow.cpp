@@ -5,11 +5,13 @@
 #include <QTextEdit>
 #include <QPlainTextEdit>
 
+#include "Logging.h"
 #include "jobsPage.h"
 #include "operatorPage.h"
 #include "customMenuBar.h"
 #include "sideBar.h"
 #include "settingsPage.h"
+#include "pnpRunner.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -20,10 +22,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     customMenuBar* menuBar_instance = new customMenuBar(this);
     this->setMenuBar(menuBar_instance);
     
-    sideBar* sideBar_instance = new sideBar(this);
+    sideBar* sideBar_instance = new sideBar(m_pPnPRunner_instance, this);
     jobsPage* jobsPage_instance = new jobsPage(this);
     operatorPage* operatorPage_instance = new operatorPage(this);
-    settingsPage* settingsPage_instance = new settingsPage(this);
+    settingsPage* settingsPage_instance = new settingsPage(m_pPnPRunner_instance, this);
 
     QTabWidget *tabs = new QTabWidget();
     tabs->addTab(jobsPage_instance, "Jobs");

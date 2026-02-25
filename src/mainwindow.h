@@ -13,8 +13,8 @@
 #include <QComboBox>
 #include <QTimer>
 
-#include "comm.hpp"
-
+//#include "comm.hpp"
+#include "pnpRunner.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -37,7 +37,9 @@ private:
 
     // Comm and flow control member variables
     QList<QString> listPorts();
-    Comm m_PNPMachineComm;
+    //Comm m_PNPMachineComm;
+    std::shared_ptr<PnPRunner> m_pPnPRunner_instance;
+
 
 private slots:
     void onTabBarClicked(int index);
