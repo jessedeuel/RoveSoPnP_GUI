@@ -99,6 +99,7 @@ operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget *parent
     try
     {
         m_pGantryCam = std::make_unique<BasicCam>("/dev/video0", 640, 480, 30, PIXEL_FORMATS::eBGR, 90.0, 90.0, false, 1);
+        qDebug() << "Camera opened successfully. Starting camera thread...";
         m_pGantryCam->Start();
     }
     catch (...)
@@ -106,10 +107,7 @@ operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget *parent
         m_pCameraDisplayLabel->setText("Camera Error");
     }
 
-    // Unified timer for UI State updates and Camera Polling
-    m_pUpdateTimer = new QTimer(this);
-    connect(m_pUpdateTimer, &QTimer::timeout, this, &operatorPage::updateUIAndCamera);
-    m_pUpdateTimer->start(33); // ~30 FPS
+    qDebug() << "operatorPage initialized.";
 }
 
 operatorPage::~operatorPage()

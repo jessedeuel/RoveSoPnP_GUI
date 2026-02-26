@@ -2,6 +2,8 @@
 
 sideBar::sideBar(std::shared_ptr<PnPRunner> pPnPRunner_instance, QWidget *parent) : QWidget(parent)
 {
+    this->m_pPnPRunner_instance = pPnPRunner_instance;
+
     m_pSideBarLayout = new QGridLayout();
     this->setLayout(m_pSideBarLayout);
     
@@ -44,6 +46,7 @@ void sideBar::onStartEndProgramButtonClicked()
     if (m_pStartEndProgramButton->styleSheet().contains("background-color: red;"))
     {
         // This means program is currently running, so we want to stop it, then change the button to green and text to "Start Program"
+        //m_pPnPRunner_instance->RequestStop();
 
         m_pStartEndProgramButton->setStyleSheet("background-color: green;");
         m_pStartEndProgramButton->setText("Start Program");
@@ -51,6 +54,7 @@ void sideBar::onStartEndProgramButtonClicked()
     else
     {
         // This means that no program is currently running, so we want to start it, then change the button to red and text to "End Program"
+        //m_pPnPRunner_instance->Start();
 
         m_pStartEndProgramButton->setStyleSheet("background-color: red;");
         m_pStartEndProgramButton->setText("End Program");
