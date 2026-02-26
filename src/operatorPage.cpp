@@ -1,21 +1,52 @@
 #include <operatorPage.h>
 
-operatorPage::operatorPage(QWidget *parent)
+operatorPage::operatorPage(QWidget *parent) : m_eVisionMode(VisionMode::None)
 {
     m_pOperatorPageLayout = new QGridLayout();
     this->setLayout(m_pOperatorPageLayout);
     m_pRunJobButton = new QPushButton("Run Job", this);
-    m_pOperatorPageLayout->addWidget(m_pRunJobButton);
+    m_pOperatorPageLayout->addWidget(m_pRunJobButton, 0, 0, 1, 2);
 
-    // Camera Display Setup
+    // --- Vision Pipeline Controls Setup ---
+    m_pVisionGroupBox = new QGroupBox("Live Vision Pipelines", this);
+    QHBoxLayout *visionLayout = new QHBoxLayout();
+
+    m_pModeNoneBtn = new QPushButton("Raw Feed", this);
+    m_pModeFiducialBtn = new QPushButton("Detect Fiducials", this);
+    m_pModeComponentBtn = new QPushButton("Component Align", this);
+    m_pModeHomingBtn = new QPushButton("Visual Homing", this);
+
+    visionLayout->addWidget(m_pModeNoneBtn);
+    visionLayout->addWidget(m_pModeFiducialBtn);
+    visionLayout->addWidget(m_pModeComponentBtn);
+    visionLayout->addWidget(m_pModeHomingBtn);
+    m_pVisionGroupBox->setLayout(visionLayout);
+
+    m_pOperatorPageLayout->addWidget(m_pVisionGroupBox, 1, 0, 1, 2);
+
+    // Connect Vision Buttons
+    connect(m_pModeNoneBtn, &QPushButton::clicked, this, &operatorPage::setVisionModeNone);
+    connect(m_pModeFiducialBtn, &QPushButton::clicked, this, &operatorPage::setVisionModeFiducial);
+    connect(m_pModeComponentBtn, &QPushButton::clicked, this, &operatorPage::setVisionModeComponent);
+    connect(m_pModeHomingBtn, &QPushButton::clicked, this, &operatorPage::setVisionModeHoming);
+
+    // --- Camera Display Setup ---
     m_pCameraDisplayLabel = new QLabel("Camera Feed Loading...", this);
     m_pCameraDisplayLabel->setObjectName("cameraDisplayLabel");
     m_pCameraDisplayLabel->setMinimumSize(640, 480);
     m_pCameraDisplayLabel->setAlignment(Qt::AlignCenter);
     m_pCameraDisplayLabel->setStyleSheet("border: 1px solid black; background-color: #333; color: white;");
-    m_pOperatorPageLayout->addWidget(m_pCameraDisplayLabel);
+    m_pOperatorPageLayout->addWidget(m_pCameraDisplayLabel, 2, 0, 1, 2);
 
-    // Camera Initialization
+    // --- GCode Entry Setup ---
+    m_pGCodeEntryTextBox = new QTextEdit("Enter GCode", this);
+    m_pGCodeEntryTextBox->setMaximumHeight(50);
+    m_pGCodeSendButton = new QPushButton("Send GCode", this);
+    m_pOperatorPageLayout->addWidget(m_pGCodeEntryTextBox, 3, 0);
+    m_pOperatorPageLayout->addWidget(m_pGCodeSendButton, 3, 1);
+    connect(m_pGCodeSendButton, &QPushButton::clicked, this, &operatorPage::onGCodeSendButtonClicked);
+
+    // --- Camera Initialization ---
     qDebug() << "Attempting to open camera /dev/video0...";
     try
     {
@@ -29,36 +60,28 @@ operatorPage::operatorPage(QWidget *parent)
         qDebug() << "CRITICAL: Camera initialization failed:" << e.what();
         m_pCameraDisplayLabel->setText("Camera Error: Initialization Failed");
     }
-    catch (...)
-    {
-        qDebug() << "CRITICAL: Camera initialization failed with unknown error.";
-    }
 
     // Start Timer to poll frames at ~30 FPS (33ms)
     m_pCameraTimer = new QTimer(this);
     connect(m_pCameraTimer, &QTimer::timeout, this, &operatorPage::updateCameraDisplay);
     m_pCameraTimer->start(33);
-
-    m_pGCodeEntryTextBox = new QTextEdit("Enter GCode", this);
-    m_pGCodeSendButton = new QPushButton("Send GCode", this);
-    m_pOperatorPageLayout->addWidget(m_pGCodeEntryTextBox);
-    m_pOperatorPageLayout->addWidget(m_pGCodeSendButton);
-
-    connect(m_pGCodeSendButton, &QPushButton::clicked, this, &operatorPage::onGCodeSendButtonClicked);
 }
 
 operatorPage::~operatorPage()
 {
     qDebug() << "Destroying operatorPage...";
-
-    // Stop camera and thread pool safely before destruction
     if (m_pGantryCam)
     {
-        qDebug() << "Stopping Camera...";
         m_pGantryCam->RequestStop();
         m_pGantryCam->Join();
     }
 }
+
+// Vision Toggles
+void operatorPage::setVisionModeNone() { m_eVisionMode = VisionMode::None; }
+void operatorPage::setVisionModeFiducial() { m_eVisionMode = VisionMode::Fiducial; }
+void operatorPage::setVisionModeComponent() { m_eVisionMode = VisionMode::Component; }
+void operatorPage::setVisionModeHoming() { m_eVisionMode = VisionMode::Homing; }
 
 void operatorPage::onRunJobButtonClicked()
 {
@@ -67,37 +90,68 @@ void operatorPage::onRunJobButtonClicked()
 
 void operatorPage::updateCameraDisplay()
 {
-    // Safety check: verify camera exists and is running
     if (!m_pGantryCam || m_pGantryCam->GetThreadState() != Thread<void>::ThreadState::eRunning)
-    {
         return;
-    }
 
-    // 1. If we have no active request, make one.
     if (!m_frameReadyFuture.valid())
     {
         m_frameReadyFuture = m_pGantryCam->RequestFrameCopy(m_currentFrame);
-        return; // Return and wait for next timer tick
+        return;
     }
 
-    // 2. If we have a request, check if it is ready (without blocking).
     if (m_frameReadyFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
     {
         try
         {
-            // Retrieve result
             bool success = m_frameReadyFuture.get();
 
             if (success && !m_currentFrame.empty())
             {
-                // Convert OpenCV BGR to Qt RGB
-                cv::Mat rgbFrame;
-                cv::cvtColor(m_currentFrame, rgbFrame, cv::COLOR_BGR2RGB);
+                // Create a working copy for drawing OpenCV overlays
+                cv::Mat displayFrame = m_currentFrame.clone();
 
-                // Check for valid dimensions
+                // --- INTEGRATE VISION PIPELINES HERE ---
+                if (m_eVisionMode == VisionMode::Fiducial)
+                {
+                    auto fiducials = FiducialDetector::DetectFiducials(displayFrame);
+                    for (const auto &pt : fiducials)
+                    {
+                        cv::circle(displayFrame, pt, 15, cv::Scalar(0, 255, 0), 2);                       // Green Circle
+                        cv::drawMarker(displayFrame, pt, cv::Scalar(0, 0, 255), cv::MARKER_CROSS, 20, 2); // Red Crosshair
+                    }
+                }
+                else if (m_eVisionMode == VisionMode::Component)
+                {
+                    auto pose = ComponentDetector::DetectComponentPose(displayFrame);
+                    if (pose.bFound)
+                    {
+                        cv::Point2f rect_points[4];
+                        pose.cvBoundingBox.points(rect_points);
+                        for (int j = 0; j < 4; j++)
+                        {
+                            cv::line(displayFrame, rect_points[j], rect_points[(j + 1) % 4], cv::Scalar(255, 0, 0), 2); // Blue Box
+                        }
+                        std::string text = "Angle: " + std::to_string(pose.dRotationDegrees);
+                        cv::putText(displayFrame, text, cv::Point(20, 40), cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 255, 255), 2);
+                    }
+                }
+                else if (m_eVisionMode == VisionMode::Homing)
+                {
+                    // For homing, you need a camera config. We mock a pinhole config here for live UI testing.
+                    CameraConfig mockConfig;
+                    mockConfig.cvK = (cv::Mat_<double>(3, 3) << 800, 0, 320, 0, 800, 240, 0, 0, 1);
+                    mockConfig.cvD = cv::Mat::zeros(4, 1, CV_64F);
+
+                    // Pass displayFrame pointer to get debug drawing of axes automatically
+                    VisualHoming::FindHomeMarker(displayFrame, mockConfig, 50.0f, 0, cv::aruco::DICT_4X4_50, &displayFrame);
+                }
+
+                // Convert processed BGR OpenCV Mat to RGB Qt Image
+                cv::Mat rgbFrame;
+                cv::cvtColor(displayFrame, rgbFrame, cv::COLOR_BGR2RGB);
+
                 if (rgbFrame.cols > 0 && rgbFrame.rows > 0)
                 {
-                    // Create QImage with deep copy to prevent segfaults
                     QImage qimg((uchar *)rgbFrame.data, rgbFrame.cols, rgbFrame.rows, rgbFrame.step, QImage::Format_RGB888);
                     m_pCameraDisplayLabel->setPixmap(QPixmap::fromImage(qimg.copy()));
                 }
@@ -105,14 +159,14 @@ void operatorPage::updateCameraDisplay()
         }
         catch (cv::Exception &e)
         {
-            qDebug() << "OpenCV Error in updateCameraDisplay: " << e.what();
+            qDebug() << "OpenCV Error: " << e.what();
         }
         catch (...)
         {
             qDebug() << "Unknown Error in updateCameraDisplay";
         }
 
-        // 3. Request the NEXT frame immediately
+        // Request the NEXT frame immediately
         m_frameReadyFuture = m_pGantryCam->RequestFrameCopy(m_currentFrame);
     }
 }
@@ -120,5 +174,4 @@ void operatorPage::updateCameraDisplay()
 void operatorPage::onGCodeSendButtonClicked()
 {
     qDebug("GCode Send Button Clicked");
-
 }

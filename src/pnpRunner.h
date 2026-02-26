@@ -3,7 +3,7 @@
 #include <string>
 #include <atomic>
 
-#include "Thread.hpp"
+#include "../libdeps/RoveSoPnP_Vision/src/interfaces/Thread.hpp"
 #include "pnp.hpp"
 
 class PnPRunner : public Thread<PnP>
@@ -11,9 +11,9 @@ class PnPRunner : public Thread<PnP>
 public:
     PnPRunner(std::string comPort = "");
     ~PnPRunner();
-    
+
     void Stop();
-    std::unique_ptr<PnP>& getPnPMachine() { return m_pPnPMachine; }
+    std::unique_ptr<PnP> &getPnPMachine() { return m_pPnPMachine; }
 
 private:
     std::string m_sComPort;

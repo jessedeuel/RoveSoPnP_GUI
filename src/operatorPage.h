@@ -7,10 +7,12 @@
 #include <QPixmap>
 #include <QWidget>
 #include <QGridLayout>
+#include <QHBoxLayout>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QLabel>
 #include <QTimer>
+#include <QGroupBox>
 
 #include <cstdio>
 #include <memory>
@@ -25,6 +27,15 @@
 #include "vision/algorithms/VisualHoming.hpp"
 #include "vision/cameras/BasicCam.h"
 
+// Enum to manage which vision pipeline is currently active
+enum class VisionMode
+{
+    None,
+    Fiducial,
+    Component,
+    Homing
+};
+
 class operatorPage : public QWidget
 {
     Q_OBJECT
@@ -34,15 +45,26 @@ public:
     ~operatorPage();
 
 private:
-    QGridLayout* m_pOperatorPageLayout;
-    QPushButton* m_pRunJobButton;
-    QTextEdit* m_pGCodeEntryTextBox;
-    QPushButton* m_pGCodeSendButton;
+    QGridLayout *m_pOperatorPageLayout;
 
+    // UI Controls
+    QPushButton *m_pRunJobButton;
+    QTextEdit *m_pGCodeEntryTextBox;
+    QPushButton *m_pGCodeSendButton;
+
+    // Vision Pipeline Toggles
+    QGroupBox *m_pVisionGroupBox;
+    QPushButton *m_pModeNoneBtn;
+    QPushButton *m_pModeFiducialBtn;
+    QPushButton *m_pModeComponentBtn;
+    QPushButton *m_pModeHomingBtn;
+
+    // Camera
     QLabel *m_pCameraDisplayLabel;
     QTimer *m_pCameraTimer;
 
     // Vision member variables
+    VisionMode m_eVisionMode;
     cv::Mat m_currentFrame;
     std::future<bool> m_frameReadyFuture;
 
@@ -55,4 +77,10 @@ private slots:
     void onRunJobButtonClicked();
     void updateCameraDisplay();
     void onGCodeSendButtonClicked();
+
+    // Vision Toggle Slots
+    void setVisionModeNone();
+    void setVisionModeFiducial();
+    void setVisionModeComponent();
+    void setVisionModeHoming();
 };
