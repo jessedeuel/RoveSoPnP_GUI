@@ -52,6 +52,7 @@ operatorPage::operatorPage(QWidget *parent) : m_eVisionMode(VisionMode::None)
     {
         // Initialize BasicCam (device 0, 640x480, 30FPS)
         m_pGantryCam = std::make_unique<BasicCam>("/dev/video0", 640, 480, 30, PIXEL_FORMATS::eBGR, 90.0, 90.0, false, 1);
+        qDebug() << "Camera opened successfully. Starting camera thread...";
         m_pGantryCam->Start();
         qDebug() << "Camera started successfully.";
     }
@@ -65,6 +66,8 @@ operatorPage::operatorPage(QWidget *parent) : m_eVisionMode(VisionMode::None)
     m_pCameraTimer = new QTimer(this);
     connect(m_pCameraTimer, &QTimer::timeout, this, &operatorPage::updateCameraDisplay);
     m_pCameraTimer->start(33);
+
+    qDebug() << "operatorPage initialized.";
 }
 
 operatorPage::~operatorPage()

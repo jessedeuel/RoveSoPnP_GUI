@@ -27,6 +27,8 @@ private:
     QPushButton* m_pPauseButton;
     QPushButton* m_pStartEndProgramButton;
 
+    std::shared_ptr<PnPRunner> m_pPnPRunner_instance;
+
 private slots:
     void onPauseButtonClicked();
     void onStartEndProgramButtonClicked();

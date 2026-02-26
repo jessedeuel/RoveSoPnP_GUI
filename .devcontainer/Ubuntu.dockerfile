@@ -16,10 +16,6 @@ ARG TZ="America/Chicago"
 RUN echo "${TZ}" > /etc/localtime && \
     echo "${TZ}" > /etc/timezone
 
-ARG QT_A=6
-ARG QT_B=6.9.3
-
-
 # Set the default shell to bash with pipefail option. This ensures that the shell exits immediately if any command exits with a non-zero status.
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -110,7 +106,7 @@ RUN git clone --depth 1 --branch ${OPENCV_VERSION} https://github.com/opencv/ope
     -D BUILD_opencv_tracking=ON \
     -D ENABLE_FAST_MATH=1 \
     -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules .. && \
-    make install -j8 && ldconfig && \
+    make install -j16 && ldconfig && \
     cd ../.. && \
     rm -rf opencv_contrib && \
     rm -rf opencv
@@ -133,17 +129,23 @@ ARG QT_EMAIL
 ENV QT_EMAIL=$QT_EMAIL
 ARG QT_PASSWD
 ENV QT_PASSWD=$QT_PASSWD
+ARG QT_INSTALL_DIR="/opt/Qt"
 
-#--mount=type=secret,id=QT_PASSWD,env=QT_PASSWD \
-#--mount=type=secret,id=QT_EMAIL,env=QT_EMAIL \
 RUN echo "Qt email: ${QT_EMAIL}"
 RUN echo "Qt passwd: ${QT_PASSWD}"
+RUN echo "Qt install dir: ${QT_INSTALL_DIR}"
 
 RUN wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run && \
     chmod +x qt-online-installer-linux-x64-online.run && \
-    ./qt-online-installer-linux-x64-online.run --root ~/Qt --accept-licenses --accept-obligations \
+    ./qt-online-installer-linux-x64-online.run --root ${QT_INSTALL_DIR} --accept-licenses --accept-obligations \
     --confirm-command --email ${QT_EMAIL} --pw ${QT_PASSWD} --accept-messages --essential \
-    install qt6.9.3-sdk
+    install qt6.9.3-essentials qt.qt6.693.addons.qtmultimedia 
+
+RUN cd ${QT_INSTALL_DIR} && \
+    ./MaintenanceTool clear-cache && \
+    cd ..
+
+#RUN ./MaintenanceTool clear-cache
 
 # Install Qt
 #RUN wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run
