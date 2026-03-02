@@ -2,9 +2,13 @@
 #include <QLocale>
 
 #include "mainwindow.h"
+#include "Logging.h"
+
 
 int main(int argc, char *argv[])
 {
+    logging::InitializeLoggers("../ui_logs/");
+
     QApplication a(argc, argv);
 
     MainWindow w;
