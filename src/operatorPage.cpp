@@ -1,7 +1,11 @@
+#include <QMessageBox>
+
 #include <operatorPage.h>
 
-operatorPage::operatorPage(QWidget *parent) : m_eVisionMode(VisionMode::None)
+operatorPage::operatorPage(std::shared_ptr<PnPRunner> pPnPRunner_instance, QWidget *parent) : m_eVisionMode(VisionMode::None)
 {
+    this->m_pPnPRunner_instance = std::move(pPnPRunner_instance);
+
     m_pOperatorPageLayout = new QGridLayout();
     this->setLayout(m_pOperatorPageLayout);
     m_pRunJobButton = new QPushButton("Run Job", this);
@@ -177,4 +181,26 @@ void operatorPage::updateCameraDisplay()
 void operatorPage::onGCodeSendButtonClicked()
 {
     qDebug("GCode Send Button Clicked");
+    QString gcode = m_pGCodeEntryTextBox->toPlainText();
+    qDebug() << "GCode to send:" << gcode;
+
+    if (this->m_pPnPRunner_instance == nullptr)
+    {
+        qDebug() << "PnPRunner not instantiated.";
+        QMessageBox msgBox;
+        msgBox.setText("Machine not connected.");
+        msgBox.exec();
+    }
+    else
+    {
+        if (this->m_pPnPRunner_instance->getState() == "IDLE")
+        {
+            qDebug() << "PnP is currently IDLE. Sending GCode command.";
+            this->m_pPnPRunner_instance->sendGCode(gcode.toStdString());
+        }
+        else
+        {
+            qDebug() << "PnP is currently not IDLE. Current state:" << QString::fromStdString(m_pPnPRunner_instance->getState()) << ". GCode command cannot be sent.";
+        }
+    }
 }

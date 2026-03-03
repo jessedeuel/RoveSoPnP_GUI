@@ -27,6 +27,8 @@
 #include "vision/algorithms/VisualHoming.hpp"
 #include "vision/cameras/BasicCam.h"
 
+#include "pnpRunner.h"
+
 // Enum to manage which vision pipeline is currently active
 enum class VisionMode
 {
@@ -41,11 +43,12 @@ class operatorPage : public QWidget
     Q_OBJECT
 
 public:
-    operatorPage(QWidget *parent = nullptr);
+    operatorPage(std::shared_ptr<PnPRunner> pPnPRunner_instance, QWidget *parent = nullptr);
     ~operatorPage();
 
 private:
     QGridLayout *m_pOperatorPageLayout;
+    std::shared_ptr<PnPRunner> m_pPnPRunner_instance;
 
     // UI Controls
     QPushButton *m_pRunJobButton;
