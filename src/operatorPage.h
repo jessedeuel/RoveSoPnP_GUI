@@ -1,33 +1,21 @@
 #pragma once
 
-#include <iostream>
-#include <string.h>
-
-#include <QImage>
-#include <QPixmap>
 #include <QWidget>
 #include <QGridLayout>
+#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QPushButton>
-#include <QTextEdit>
 #include <QLabel>
-#include <QTimer>
 #include <QGroupBox>
+#include <QTimer>
+#include <QTextEdit>
 
-#include <cstdio>
 #include <memory>
-#include <vector>
 #include <future>
 
-#include "vision/algorithms/CameraCalibration.hpp"
-#include "vision/algorithms/ComponentDetector.hpp"
-#include "vision/algorithms/FicucialDetector.hpp"
-#include "vision/algorithms/PixelTo3D.hpp"
-#include "vision/algorithms/PlacementVerifier.hpp"
-#include "vision/algorithms/VisualHoming.hpp"
+#include "pnpRunner.h"
 #include "vision/cameras/BasicCam.h"
 
-// Enum to manage which vision pipeline is currently active
 enum class VisionMode
 {
     None,
@@ -41,46 +29,61 @@ class operatorPage : public QWidget
     Q_OBJECT
 
 public:
-    operatorPage(QWidget *parent = nullptr);
+    operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget *parent = nullptr);
     ~operatorPage();
 
 private:
-    QGridLayout *m_pOperatorPageLayout;
+    std::shared_ptr<PnPRunner> m_pPnPRunner;
 
-    // UI Controls
-    QPushButton *m_pRunJobButton;
-    QTextEdit *m_pGCodeEntryTextBox;
-    QPushButton *m_pGCodeSendButton;
+    // --- UI Layouts ---
+    QGridLayout *m_pMainLayout;
 
-    // Vision Pipeline Toggles
-    QGroupBox *m_pVisionGroupBox;
+    // --- Machine Status Panel ---
+    QGroupBox *m_pStatusGroup;
+    QLabel *m_pStateLabel;
+    QLabel *m_pPositionLabel;
+
+    // --- Control Panel ---
+    QGroupBox *m_pControlGroup;
+    QPushButton *m_pHomeBtn;
+    QPushButton *m_pCalibrateVisionBtn;
+    QPushButton *m_pStartJobBtn;
+    QPushButton *m_pPauseBtn;
+    QPushButton *m_pAbortBtn;
+
+    // --- Vision Panel ---
+    QGroupBox *m_pVisionGroup;
+    QLabel *m_pCameraDisplayLabel;
     QPushButton *m_pModeNoneBtn;
     QPushButton *m_pModeFiducialBtn;
     QPushButton *m_pModeComponentBtn;
     QPushButton *m_pModeHomingBtn;
 
-    // Camera
-    QLabel *m_pCameraDisplayLabel;
-    QTimer *m_pCameraTimer;
+    // --- Manual Control ---
+    QTextEdit *m_pGCodeEntryTextBox;
+    QPushButton *m_pGCodeSendButton;
 
-    // Vision member variables
+    // --- Vision & Update Logic ---
+    QTimer *m_pUpdateTimer;
     VisionMode m_eVisionMode;
     cv::Mat m_currentFrame;
     std::future<bool> m_frameReadyFuture;
-
-    IPS m_IterPersecond;
     std::unique_ptr<BasicCam> m_pGantryCam;
-    std::vector<uint32_t> m_vThreadFPSValue;
-    std::vector<cv::Mat> m_vCalibrationImages;
 
 private slots:
-    void onRunJobButtonClicked();
-    void updateCameraDisplay();
-    void onGCodeSendButtonClicked();
+    void updateUIAndCamera();
+    void onGCodeSend();
 
-    // Vision Toggle Slots
-    void setVisionModeNone();
-    void setVisionModeFiducial();
-    void setVisionModeComponent();
-    void setVisionModeHoming();
+    // Machine Controls
+    void onHomeClicked();
+    void onCalibrateClicked();
+    void onStartJobClicked();
+    void onPauseClicked();
+    void onAbortClicked();
+
+    // Vision Toggles
+    void setVisionNone() { m_eVisionMode = VisionMode::None; }
+    void setVisionFiducial() { m_eVisionMode = VisionMode::Fiducial; }
+    void setVisionComponent() { m_eVisionMode = VisionMode::Component; }
+    void setVisionHoming() { m_eVisionMode = VisionMode::Homing; }
 };
