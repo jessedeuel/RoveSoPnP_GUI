@@ -2,15 +2,16 @@
 #include <QDebug>
 #include <QPixmap>
 #include <QImage>
+#include <QMessageBox>
 
 #include "vision/algorithms/FicucialDetector.hpp"
 #include "vision/algorithms/ComponentDetector.hpp"
 #include "vision/algorithms/VisualHoming.hpp"
 
 operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget *parent)
-    : QWidget(parent), m_pPnPRunner(pnpRunner), m_eVisionMode(VisionMode::None)
+    : QWidget(parent), m_pPnPRunner_instance(pnpRunner), m_eVisionMode(VisionMode::None)
 {
-    m_pMainLayout = new QGridLayout(this);
+    m_pOperatorPageLayout = new QGridLayout(this);
 
     // ==========================================
     // 1. MACHINE STATUS PANEL (Top Left)
@@ -23,7 +24,7 @@ operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget *parent
 
     statusLayout->addWidget(m_pStateLabel);
     statusLayout->addWidget(m_pPositionLabel);
-    m_pMainLayout->addWidget(m_pStatusGroup, 0, 0);
+    m_pOperatorPageLayout->addWidget(m_pStatusGroup, 0, 0);
 
     // ==========================================
     // 2. CONTROL PANEL (Bottom Left)
@@ -43,7 +44,7 @@ operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget *parent
     controlLayout->addWidget(m_pStartJobBtn);
     controlLayout->addWidget(m_pPauseBtn);
     controlLayout->addWidget(m_pAbortBtn);
-    m_pMainLayout->addWidget(m_pControlGroup, 1, 0);
+    m_pOperatorPageLayout->addWidget(m_pControlGroup, 1, 0);
 
     // Connect control buttons to PnPRunner state machine
     connect(m_pHomeBtn, &QPushButton::clicked, this, &operatorPage::onHomeClicked);
@@ -75,7 +76,16 @@ operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget *parent
 
     visionLayout->addLayout(visionBtnLayout);
     visionLayout->addWidget(m_pCameraDisplayLabel);
-    m_pMainLayout->addWidget(m_pVisionGroup, 0, 1, 2, 1); // Span 2 rows
+    m_pOperatorPageLayout->addWidget(m_pVisionGroup, 0, 1, 2, 1); // Span 2 rows
+
+    // --- GCode Entry Setup ---
+    m_pGCodeEntryTextBox = new QTextEdit("Enter GCode", this);
+    m_pGCodeEntryTextBox->setMaximumHeight(50);
+    m_pGCodeSendButton = new QPushButton("Send GCode", this);
+    m_pOperatorPageLayout->addWidget(m_pGCodeEntryTextBox, 3, 0);
+    m_pOperatorPageLayout->addWidget(m_pGCodeSendButton, 3, 1);
+    // Connect GCode Send Button
+    connect(m_pGCodeSendButton, &QPushButton::clicked, this, &operatorPage::onGCodeSendButtonClicked);
 
     // Connect Vision Buttons
     connect(m_pModeNoneBtn, &QPushButton::clicked, this, &operatorPage::setVisionNone);
@@ -112,33 +122,28 @@ operatorPage::~operatorPage()
 }
 
 // --- User Interaction Hooks ---
-void operatorPage::onHomeClicked() { m_pPnPRunner->CommandHomeMachine(); }
-void operatorPage::onCalibrateClicked() { m_pPnPRunner->CommandCalibrateVision(); }
-void operatorPage::onStartJobClicked() { m_pPnPRunner->CommandStartJob("board/CoreBoard-all-pos.csv"); }
-void operatorPage::onAbortClicked() { m_pPnPRunner->CommandAbort(); }
+void operatorPage::onHomeClicked() { m_pPnPRunner_instance->CommandHomeMachine(); }
+void operatorPage::onCalibrateClicked() { m_pPnPRunner_instance->CommandCalibrateVision(); }
+void operatorPage::onStartJobClicked() { m_pPnPRunner_instance->CommandStartJob("board/CoreBoard-all-pos.csv"); }
+void operatorPage::onAbortClicked() { m_pPnPRunner_instance->CommandAbort(); }
 
 void operatorPage::onPauseClicked()
 {
-    if (m_pPnPRunner->GetCurrentState() == MachineState::RUNNING_JOB)
+    if (m_pPnPRunner_instance->GetCurrentState() == MachineState::RUNNING_JOB)
     {
-        m_pPnPRunner->CommandPauseJob();
+        m_pPnPRunner_instance->CommandPauseJob();
     }
-    else if (m_pPnPRunner->GetCurrentState() == MachineState::PAUSED)
+    else if (m_pPnPRunner_instance->GetCurrentState() == MachineState::PAUSED)
     {
-        m_pPnPRunner->CommandResumeJob();
+        m_pPnPRunner_instance->CommandResumeJob();
     }
-}
-
-void operatorPage::onGCodeSend()
-{
-    // Implement GCode sending if manual entry box is later added
 }
 
 // --- Main Update Loop ---
 void operatorPage::updateUIAndCamera()
 {
     // 1. Update UI Status based on PnPRunner State
-    MachineState currentState = m_pPnPRunner->GetCurrentState();
+    MachineState currentState = m_pPnPRunner_instance->GetCurrentState();
 
     switch (currentState)
     {
@@ -238,5 +243,32 @@ void operatorPage::updateUIAndCamera()
         {
         }
         m_frameReadyFuture = m_pGantryCam->RequestFrameCopy(m_currentFrame);
+    }
+}
+
+void operatorPage::onGCodeSendButtonClicked()
+{
+    qDebug("GCode Send Button Clicked");
+    QString gcode = m_pGCodeEntryTextBox->toPlainText();
+    qDebug() << "GCode to send:" << gcode;
+
+    if (this->m_pPnPRunner_instance == nullptr)
+    {
+        qDebug() << "PnPRunner not instantiated.";
+        QMessageBox msgBox;
+        msgBox.setText("Machine not connected.");
+        msgBox.exec();
+    }
+    else
+    {
+        if (this->m_pPnPRunner_instance->GetCurrentState() == MachineState::IDLE)
+        {
+            qDebug() << "PnP is currently IDLE. Sending GCode command.";
+            this->m_pPnPRunner_instance->sendGCode(gcode.toStdString());
+        }
+        else
+        {
+            qDebug() << "PnP is currently not IDLE. Current state:" << QString::fromStdString(m_pPnPRunner_instance->GetCurrentStateString()) << ". GCode command cannot be sent.";
+        }
     }
 }

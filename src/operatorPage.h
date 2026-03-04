@@ -33,10 +33,10 @@ public:
     ~operatorPage();
 
 private:
-    std::shared_ptr<PnPRunner> m_pPnPRunner;
+    std::shared_ptr<PnPRunner> m_pPnPRunner_instance;
 
     // --- UI Layouts ---
-    QGridLayout *m_pMainLayout;
+    QGridLayout *m_pOperatorPageLayout;
 
     // --- Machine Status Panel ---
     QGroupBox *m_pStatusGroup;
@@ -72,7 +72,7 @@ private:
 
 private slots:
     void updateUIAndCamera();
-    void onGCodeSend();
+    void onGCodeSendButtonClicked();
 
     // Machine Controls
     void onHomeClicked();

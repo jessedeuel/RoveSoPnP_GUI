@@ -30,7 +30,9 @@ public:
 
     // --- State Machine Controls ---
     MachineState GetCurrentState();
+    std::string GetCurrentStateString();
     void SetState(MachineState newState);
+    void sendGCode(const std::string &gcode);
 
     // --- UI Command Hooks ---
     void CommandHomeMachine();

@@ -119,3 +119,32 @@ void PnPRunner::ThreadedContinuousCode()
 }
 
 PnP PnPRunner::PooledLinearCode() { return 0; }
+
+void PnPRunner::sendGCode(const std::string &gcode)
+{
+    LOG_DEBUG(logging::g_qSharedLogger, "Sending GCode: ", gcode);
+    m_pPnPMachine->grbl.sendCommand(gcode);
+}
+
+std::string PnPRunner::GetCurrentStateString()
+{
+    switch (m_eCurrentState.load())
+    {
+    case MachineState::DISCONNECTED:
+        return "DISCONNECTED";
+    case MachineState::IDLE:
+        return "IDLE";
+    case MachineState::HOMING:
+        return "HOMING";
+    case MachineState::VISION_CALIBRATION:
+        return "VISION_CALIBRATION";
+    case MachineState::RUNNING_JOB:
+        return "RUNNING_JOB";
+    case MachineState::PAUSED:
+        return "PAUSED";
+    case MachineState::ERROR_STATE:
+        return "ERROR_STATE";
+    default:
+        return "UNKNOWN";
+    }
+}
