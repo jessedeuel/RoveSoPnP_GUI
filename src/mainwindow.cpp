@@ -17,15 +17,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     qDebug() << "Initializing MainWindow...";
 
+    // Initialize the shared runner instance before passing it into UI modules
+    m_pPnPRunner_instance = std::make_shared<PnPRunner>("/dev/ttyUSB0"); // Default COM port; update as needed
+
     QGridLayout *mainLayout = new QGridLayout();
 
-    customMenuBar* menuBar_instance = new customMenuBar(this);
+    customMenuBar *menuBar_instance = new customMenuBar(this);
     this->setMenuBar(menuBar_instance);
-    
-    sideBar* sideBar_instance = new sideBar(m_pPnPRunner_instance, this);
-    jobsPage* jobsPage_instance = new jobsPage(this);
-    operatorPage* operatorPage_instance = new operatorPage(m_pPnPRunner_instance, this);
-    settingsPage* settingsPage_instance = new settingsPage(m_pPnPRunner_instance, this);
+
+    sideBar *sideBar_instance = new sideBar(m_pPnPRunner_instance, this);
+    jobsPage *jobsPage_instance = new jobsPage(this);
+    operatorPage *operatorPage_instance = new operatorPage(m_pPnPRunner_instance, this);
+    settingsPage *settingsPage_instance = new settingsPage(m_pPnPRunner_instance, this);
 
     QTabWidget *tabs = new QTabWidget();
     tabs->addTab(jobsPage_instance, "Jobs");
