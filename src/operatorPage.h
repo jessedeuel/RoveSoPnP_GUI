@@ -40,7 +40,6 @@ private:
 
     // --- UI Layouts ---
     QGridLayout *m_pOperatorPageLayout;
-    std::shared_ptr<PnPRunner> m_pPnPRunner_instance;
 
     // --- Machine Status Panel ---
     QGroupBox *m_pStatusGroup;
