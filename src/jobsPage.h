@@ -18,11 +18,15 @@ public:
     ~jobsPage();
 
 private:
-    QGridLayout* m_jobsPageLayout;
-    QTableWidget* m_jobsTable;
-    QPushButton* m_uploadJobButton;
-    QTextEdit* m_currentJobTextEdit;
+    // Private qt widgets
+    QGridLayout *m_pJobsPageLayout;
+    QTableWidget *m_pJobsTable;
+    QPushButton *m_pUploadJobButton;
+    QTextEdit *m_pCurrentJobTextEdit;
+
+    // Private information variables
+    std::string m_sJobFilePath;
 
 private slots:
-    
+    void onUploadJobButtonClicked();
 };

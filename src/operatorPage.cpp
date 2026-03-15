@@ -1,24 +1,23 @@
 #include "operatorPage.h"
 #include <QDebug>
-#include <QPixmap>
 #include <QImage>
 #include <QMessageBox>
+#include <QPixmap>
 
-#include "vision/algorithms/FicucialDetector.hpp"
 #include "vision/algorithms/ComponentDetector.hpp"
+#include "vision/algorithms/FicucialDetector.hpp"
 #include "vision/algorithms/VisualHoming.hpp"
 
-operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget *parent)
-    : QWidget(parent), m_pPnPRunner_instance(pnpRunner), m_eVisionMode(VisionMode::None)
+operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget* parent) : QWidget(parent), m_pPnPRunner_instance(pnpRunner), m_eVisionMode(VisionMode::None)
 {
     m_pOperatorPageLayout = new QGridLayout(this);
 
     // ==========================================
     // 1. MACHINE STATUS PANEL (Top Left)
     // ==========================================
-    m_pStatusGroup = new QGroupBox("Machine Status", this);
-    QVBoxLayout *statusLayout = new QVBoxLayout(m_pStatusGroup);
-    m_pStateLabel = new QLabel("State: DISCONNECTED", this);
+    m_pStatusGroup            = new QGroupBox("Machine Status", this);
+    QVBoxLayout* statusLayout = new QVBoxLayout(m_pStatusGroup);
+    m_pStateLabel             = new QLabel("State: DISCONNECTED", this);
     m_pStateLabel->setStyleSheet("font-weight: bold; font-size: 16px; color: red;");
     m_pPositionLabel = new QLabel("X: 0.00  Y: 0.00  Z: 0.00  A: 0.00", this);
 
@@ -29,14 +28,14 @@ operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget *parent
     // ==========================================
     // 2. CONTROL PANEL (Bottom Left)
     // ==========================================
-    m_pControlGroup = new QGroupBox("Machine Controls", this);
-    QVBoxLayout *controlLayout = new QVBoxLayout(m_pControlGroup);
+    m_pControlGroup            = new QGroupBox("Machine Controls", this);
+    QVBoxLayout* controlLayout = new QVBoxLayout(m_pControlGroup);
 
-    m_pHomeBtn = new QPushButton("Home Machine", this);
-    m_pCalibrateVisionBtn = new QPushButton("Calibrate PCB Vision", this);
-    m_pStartJobBtn = new QPushButton("Start Job", this);
-    m_pPauseBtn = new QPushButton("Pause", this);
-    m_pAbortBtn = new QPushButton("ABORT / E-STOP", this);
+    m_pHomeBtn                 = new QPushButton("Home Machine", this);
+    m_pCalibrateVisionBtn      = new QPushButton("Calibrate PCB Vision", this);
+    m_pStartJobBtn             = new QPushButton("Start Job", this);
+    m_pPauseBtn                = new QPushButton("Pause", this);
+    m_pAbortBtn                = new QPushButton("ABORT / E-STOP", this);
     m_pAbortBtn->setStyleSheet("background-color: red; color: white; font-weight: bold;");
 
     controlLayout->addWidget(m_pHomeBtn);
@@ -56,14 +55,14 @@ operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget *parent
     // ==========================================
     // 3. VISION PANEL (Right Side)
     // ==========================================
-    m_pVisionGroup = new QGroupBox("Live Vision Feed", this);
-    QVBoxLayout *visionLayout = new QVBoxLayout(m_pVisionGroup);
+    m_pVisionGroup               = new QGroupBox("Live Vision Feed", this);
+    QVBoxLayout* visionLayout    = new QVBoxLayout(m_pVisionGroup);
 
-    QHBoxLayout *visionBtnLayout = new QHBoxLayout();
-    m_pModeNoneBtn = new QPushButton("Raw", this);
-    m_pModeFiducialBtn = new QPushButton("Fiducial", this);
-    m_pModeComponentBtn = new QPushButton("Component", this);
-    m_pModeHomingBtn = new QPushButton("Homing", this);
+    QHBoxLayout* visionBtnLayout = new QHBoxLayout();
+    m_pModeNoneBtn               = new QPushButton("Raw", this);
+    m_pModeFiducialBtn           = new QPushButton("Fiducial", this);
+    m_pModeComponentBtn          = new QPushButton("Component", this);
+    m_pModeHomingBtn             = new QPushButton("Homing", this);
     visionBtnLayout->addWidget(m_pModeNoneBtn);
     visionBtnLayout->addWidget(m_pModeFiducialBtn);
     visionBtnLayout->addWidget(m_pModeComponentBtn);
@@ -76,7 +75,7 @@ operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget *parent
 
     visionLayout->addLayout(visionBtnLayout);
     visionLayout->addWidget(m_pCameraDisplayLabel);
-    m_pOperatorPageLayout->addWidget(m_pVisionGroup, 0, 1, 2, 1); // Span 2 rows
+    m_pOperatorPageLayout->addWidget(m_pVisionGroup, 0, 1, 2, 1);    // Span 2 rows
 
     // --- GCode Entry Setup ---
     m_pGCodeEntryTextBox = new QTextEdit("Enter GCode", this);
@@ -120,10 +119,25 @@ operatorPage::~operatorPage()
 }
 
 // --- User Interaction Hooks ---
-void operatorPage::onHomeClicked() { m_pPnPRunner_instance->CommandHomeMachine(); }
-void operatorPage::onCalibrateClicked() { m_pPnPRunner_instance->CommandCalibrateVision(); }
-void operatorPage::onStartJobClicked() { m_pPnPRunner_instance->CommandStartJob("board/CoreBoard-all-pos.csv"); }
-void operatorPage::onAbortClicked() { m_pPnPRunner_instance->CommandAbort(); }
+void operatorPage::onHomeClicked()
+{
+    m_pPnPRunner_instance->CommandHomeMachine();
+}
+
+void operatorPage::onCalibrateClicked()
+{
+    m_pPnPRunner_instance->CommandCalibrateVision();
+}
+
+void operatorPage::onStartJobClicked()
+{
+    m_pPnPRunner_instance->CommandStartJob("board/CoreBoard-all-pos.csv");
+}
+
+void operatorPage::onAbortClicked()
+{
+    m_pPnPRunner_instance->CommandAbort();
+}
 
 void operatorPage::onPauseClicked()
 {
@@ -145,34 +159,34 @@ void operatorPage::updateUIAndCamera()
 
     switch (currentState)
     {
-    case MachineState::DISCONNECTED:
-        m_pStateLabel->setText("State: DISCONNECTED");
-        m_pStateLabel->setStyleSheet("color: red;");
-        break;
-    case MachineState::IDLE:
-        m_pStateLabel->setText("State: IDLE");
-        m_pStateLabel->setStyleSheet("color: green;");
-        break;
-    case MachineState::HOMING:
-        m_pStateLabel->setText("State: HOMING");
-        m_pStateLabel->setStyleSheet("color: orange;");
-        break;
-    case MachineState::VISION_CALIBRATION:
-        m_pStateLabel->setText("State: CALIBRATING VISION");
-        m_pStateLabel->setStyleSheet("color: orange;");
-        break;
-    case MachineState::RUNNING_JOB:
-        m_pStateLabel->setText("State: RUNNING JOB");
-        m_pStateLabel->setStyleSheet("color: blue;");
-        break;
-    case MachineState::PAUSED:
-        m_pStateLabel->setText("State: PAUSED");
-        m_pStateLabel->setStyleSheet("color: orange;");
-        break;
-    case MachineState::ERROR_STATE:
-        m_pStateLabel->setText("State: ERROR");
-        m_pStateLabel->setStyleSheet("color: red;");
-        break;
+        case MachineState::DISCONNECTED:
+            m_pStateLabel->setText("State: DISCONNECTED");
+            m_pStateLabel->setStyleSheet("color: red;");
+            break;
+        case MachineState::IDLE:
+            m_pStateLabel->setText("State: IDLE");
+            m_pStateLabel->setStyleSheet("color: green;");
+            break;
+        case MachineState::HOMING:
+            m_pStateLabel->setText("State: HOMING");
+            m_pStateLabel->setStyleSheet("color: orange;");
+            break;
+        case MachineState::VISION_CALIBRATION:
+            m_pStateLabel->setText("State: CALIBRATING VISION");
+            m_pStateLabel->setStyleSheet("color: orange;");
+            break;
+        case MachineState::RUNNING_JOB:
+            m_pStateLabel->setText("State: RUNNING JOB");
+            m_pStateLabel->setStyleSheet("color: blue;");
+            break;
+        case MachineState::PAUSED:
+            m_pStateLabel->setText("State: PAUSED");
+            m_pStateLabel->setStyleSheet("color: orange;");
+            break;
+        case MachineState::ERROR_STATE:
+            m_pStateLabel->setText("State: ERROR");
+            m_pStateLabel->setStyleSheet("color: red;");
+            break;
     }
 
     // Dynamic Button Toggling
@@ -204,7 +218,7 @@ void operatorPage::updateUIAndCamera()
                 if (m_eVisionMode == VisionMode::Fiducial)
                 {
                     auto fiducials = FiducialDetector::DetectFiducials(displayFrame);
-                    for (const auto &pt : fiducials)
+                    for (const auto& pt : fiducials)
                     {
                         cv::circle(displayFrame, pt, 15, cv::Scalar(0, 255, 0), 2);
                         cv::drawMarker(displayFrame, pt, cv::Scalar(0, 0, 255), cv::MARKER_CROSS, 20, 2);
@@ -219,7 +233,13 @@ void operatorPage::updateUIAndCamera()
                         pose.cvBoundingBox.points(rect_points);
                         for (int j = 0; j < 4; j++)
                             cv::line(displayFrame, rect_points[j], rect_points[(j + 1) % 4], cv::Scalar(255, 0, 0), 2);
-                        cv::putText(displayFrame, "Angle: " + std::to_string(pose.dRotationDegrees), cv::Point(20, 40), cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 255, 255), 2);
+                        cv::putText(displayFrame,
+                                    "Angle: " + std::to_string(pose.dRotationDegrees),
+                                    cv::Point(20, 40),
+                                    cv::FONT_HERSHEY_SIMPLEX,
+                                    0.8,
+                                    cv::Scalar(0, 255, 255),
+                                    2);
                     }
                 }
                 else if (m_eVisionMode == VisionMode::Homing)
@@ -233,13 +253,12 @@ void operatorPage::updateUIAndCamera()
                 // Push to UI
                 cv::Mat rgbFrame;
                 cv::cvtColor(displayFrame, rgbFrame, cv::COLOR_BGR2RGB);
-                QImage qimg((uchar *)rgbFrame.data, rgbFrame.cols, rgbFrame.rows, rgbFrame.step, QImage::Format_RGB888);
+                QImage qimg((uchar*) rgbFrame.data, rgbFrame.cols, rgbFrame.rows, rgbFrame.step, QImage::Format_RGB888);
                 m_pCameraDisplayLabel->setPixmap(QPixmap::fromImage(qimg.copy()));
             }
         }
         catch (...)
-        {
-        }
+        {}
         m_frameReadyFuture = m_pGantryCam->RequestFrameCopy(m_currentFrame);
     }
 }
@@ -266,7 +285,8 @@ void operatorPage::onGCodeSendButtonClicked()
         }
         else
         {
-            qDebug() << "PnP is currently not IDLE. Current state:" << QString::fromStdString(m_pPnPRunner_instance->GetCurrentStateString()) << ". GCode command cannot be sent.";
+            qDebug() << "PnP is currently not IDLE. Current state:" << QString::fromStdString(m_pPnPRunner_instance->GetCurrentStateString())
+                     << ". GCode command cannot be sent.";
         }
     }
 }

@@ -12,21 +12,10 @@ settingsPage::settingsPage(std::shared_ptr<PnPRunner> pPnPRunner_instance, QWidg
 
     m_pComPortConnectButton = new QPushButton("Connect");
 
-    m_pUploadJobButton = new QPushButton("Upload Job", this);
-    m_pCurrentJobTextEdit = new QTextEdit("", this);
-
-    QFontMetrics fm = QFontMetrics(m_pCurrentJobTextEdit->font());
-    int line_height = fm.lineSpacing();
-    int margins = m_pCurrentJobTextEdit->document()->documentMargin() + m_pCurrentJobTextEdit->frameWidth() * 2;
-    m_pCurrentJobTextEdit->setMaximumHeight(line_height + (int)margins * 2);
-
     m_pSettingsPageLayout->addWidget(m_pComPortSelectionBox, 0, 0);
     m_pSettingsPageLayout->addWidget(m_pComPortConnectButton, 0, 1);
-    m_pSettingsPageLayout->addWidget(m_pCurrentJobTextEdit, 1, 0);
-    m_pSettingsPageLayout->addWidget(m_pUploadJobButton, 1, 1);
 
     connect(m_pComPortConnectButton, &QPushButton::clicked, this, &settingsPage::onComPortSetButtonClicked);
-    connect(m_pUploadJobButton, &QPushButton::clicked, this, &settingsPage::onUploadJobButtonClicked);
 
     qDebug() << "settingsPage initialized.";
 }
@@ -93,23 +82,4 @@ void settingsPage::onComPortSetButtonClicked()
         m_pComPortConnectButton->setStyleSheet("background-color: red;");
         m_pPnPRunner_instance->RequestStop();
     }
-}
-
-void settingsPage::onUploadJobButtonClicked()
-{
-    qDebug("Upload Job Button clicked");
-    const QStringList filters({"PnP Files (*.csv *.xlsx *.ods)",
-                               "All Files (*)"});
-    QFileDialog dialog(this);
-    dialog.setNameFilters(filters);
-    dialog.setDirectory("./");
-    connect(&dialog, &QFileDialog::fileSelected, this, [&](const QString &filePath) mutable
-            {
-        qDebug() << "Selected file: " << filePath;
-        m_pCurrentJobTextEdit->setPlainText(filePath); });
-
-    dialog.exec();
-
-    m_sJobFilePath = m_pCurrentJobTextEdit->toPlainText().toStdString();
-    qDebug() << "Job File Path: |" << m_sJobFilePath.c_str() << "|";
 }
