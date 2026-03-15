@@ -14,7 +14,7 @@ settingsPage::settingsPage(std::shared_ptr<PnPRunner> pPnPRunner_instance, QWidg
 
     m_pUploadJobButton = new QPushButton("Upload Job", this);
     m_pCurrentJobTextEdit = new QTextEdit("", this);
-    
+
     QFontMetrics fm = QFontMetrics(m_pCurrentJobTextEdit->font());
     int line_height = fm.lineSpacing();
     int margins = m_pCurrentJobTextEdit->document()->documentMargin() + m_pCurrentJobTextEdit->frameWidth() * 2;
@@ -83,30 +83,30 @@ void settingsPage::onComPortSetButtonClicked()
 
     m_pPnPRunner_instance = std::make_unique<PnPRunner>(m_sComPort.c_str());
 
-
     if (m_pPnPRunner_instance->getPnPMachine()->getState() == IDLE)
     {
         m_pComPortConnectButton->setStyleSheet("background-color: green;");
+        m_pPnPRunner_instance->Start();
     }
     else
     {
         m_pComPortConnectButton->setStyleSheet("background-color: red;");
+        m_pPnPRunner_instance->RequestStop();
     }
 }
 
 void settingsPage::onUploadJobButtonClicked()
 {
     qDebug("Upload Job Button clicked");
-    const QStringList filters({"PnP Files (*.csv *.xlsx *.ods)", 
-                                "All Files (*)"
-                              });
+    const QStringList filters({"PnP Files (*.csv *.xlsx *.ods)",
+                               "All Files (*)"});
     QFileDialog dialog(this);
     dialog.setNameFilters(filters);
     dialog.setDirectory("./");
-    connect(&dialog, &QFileDialog::fileSelected, this, [&](const QString &filePath) mutable {
+    connect(&dialog, &QFileDialog::fileSelected, this, [&](const QString &filePath) mutable
+            {
         qDebug() << "Selected file: " << filePath;
-        m_pCurrentJobTextEdit->setPlainText(filePath);
-    });
+        m_pCurrentJobTextEdit->setPlainText(filePath); });
 
     dialog.exec();
 
