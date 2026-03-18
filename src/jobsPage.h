@@ -1,32 +1,32 @@
 #pragma once
 
-#include <QWidget>
-#include <QGridLayout>
-#include <QTableWidget>
-#include <QPushButton>
-#include <QTextEdit>
-#include <QFontMetrics>
-#include <QFileDialog>
 #include <QDebug>
+#include <QFileDialog>
+#include <QFontMetrics>
+#include <QGridLayout>
+#include <QPushButton>
+#include <QTableWidget>
+#include <QTextEdit>
+#include <QWidget>
 
 class jobsPage : public QWidget
 {
-    Q_OBJECT
+        Q_OBJECT
 
-public:
-    jobsPage(QWidget *parent = nullptr);
-    ~jobsPage();
+    public:
+        jobsPage(QWidget* parent = nullptr);
+        ~jobsPage();
 
-private:
-    // Private qt widgets
-    QGridLayout *m_pJobsPageLayout;
-    QTableWidget *m_pJobsTable;
-    QPushButton *m_pUploadJobButton;
-    QTextEdit *m_pCurrentJobTextEdit;
+    private:
+        // Private qt widgets
+        QGridLayout* m_pJobsPageLayout;
+        QTableWidget* m_pJobsTable;
+        QPushButton* m_pUploadJobButton;
+        QTextEdit* m_pCurrentJobTextEdit;
 
-    // Private information variables
-    std::string m_sJobFilePath;
+        // Private information variables
+        std::string m_sJobFilePath;
 
-private slots:
-    void onUploadJobButtonClicked();
+    private slots:
+        void onUploadJobButtonClicked();
 };

@@ -9,6 +9,7 @@ jobsPage::jobsPage(QWidget* parent) : QWidget(parent)
 
     // TODO: Add components to table through PnP->Components.getPlacementMap() and update table when new job is uploaded.
     m_pJobsTable = new QTableWidget(10, 4);
+
     QStringList horzHeaders;
     horzHeaders << "Reference" << "Value" << "Cut Tape ID" << "Package";
     m_pJobsTable->setHorizontalHeaderLabels(horzHeaders);
@@ -60,11 +61,34 @@ void jobsPage::onUploadJobButtonClicked()
     Components components(m_sJobFilePath.c_str());
 
     map<tuple<string, cuttape_t>, vector<component_t>> component_map = components.getPlacementMap();
+    int i                                                            = 0;
+
+    qDebug() << "Size of map:" << component_map.size();
+    m_pJobsTable->setRowCount(component_map.size());
 
     for (const auto& pair : component_map)
     {
-        auto test3 = pair.second.begin();
+        // if (m_pJobsTable->rowCount() - 1 >= i)
+        // {
+        //     m_pJobsTable->setRowCount(i);
+        // }
 
-        qDebug() << test3->ref << ", " << test3->value << ", " << std::get<1>(pair.first).ID << ", " << test3->package;
+        auto test3                  = pair.second.begin();
+        QTableWidgetItem* reference = new QTableWidgetItem(QString::fromStdString(test3->ref));
+        QTableWidgetItem* value     = new QTableWidgetItem(QString::fromStdString(test3->value));
+        QTableWidgetItem* ID        = new QTableWidgetItem(QString::fromStdString(std::to_string(std::get<1>(pair.first).ID)));
+        QTableWidgetItem* package   = new QTableWidgetItem(QString::fromStdString(test3->package));
+
+        qDebug() << i;
+        qDebug() << reference->text() << ", " << value->text() << ", " << ID->text() << ", " << package->text();
+        // QTableWidgetItem* item = new QTableWidgetItem("Test");
+        // m_pJobsTable->setItem(0, 0, item);
+
+        m_pJobsTable->setItem(i, 0, reference);
+        m_pJobsTable->setItem(i, 1, value);
+        m_pJobsTable->setItem(i, 2, ID);
+        m_pJobsTable->setItem(i, 3, package);
+
+        i++;
     }
 }
