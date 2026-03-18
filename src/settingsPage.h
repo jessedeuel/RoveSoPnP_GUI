@@ -20,24 +20,21 @@ class settingsPage : public QWidget
 public:
     settingsPage(std::shared_ptr<PnPRunner> pPnPRunner_instance, QWidget *parent = nullptr);
     ~settingsPage();
-    
+
     QList<QString> listPorts();
-    
-    PnP* getPnPMachine();
+
+    PnP *getPnPMachine();
     int connectPnPMachine(QString comPort, QString csvFile);
 
 private:
-    QGridLayout* m_pSettingsPageLayout;
-    QComboBox* m_pComPortSelectionBox;
+    QGridLayout *m_pSettingsPageLayout;
+    QComboBox *m_pComPortSelectionBox;
     QList<QString> m_lPorts;
-    QPushButton* m_pComPortConnectButton;
-    QPushButton* m_pUploadJobButton;
-    QTextEdit* m_pCurrentJobTextEdit;
+    QPushButton *m_pComPortConnectButton;
 
     std::unique_ptr<PnPRunner> m_pPnPRunner_instance;
     std::atomic<bool> m_bPnPThreadRunning;
 
-    std::string m_sJobFilePath;
     std::string m_sComPort;
 
     // TODO: Add thread for PnP ticking
@@ -45,5 +42,4 @@ private:
 
 private slots:
     void onComPortSetButtonClicked();
-    void onUploadJobButtonClicked();
 };
