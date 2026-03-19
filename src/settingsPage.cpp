@@ -1,13 +1,14 @@
 #include "settingsPage.h"
 
-settingsPage::settingsPage(std::shared_ptr<PnPRunner> pPnPRunner_instance, QWidget *parent) : QWidget(parent)
+// std::shared_ptr<PnPRunner> pPnPRunner_instance
+settingsPage::settingsPage(QWidget* parent) : QWidget(parent)
 {
     m_pSettingsPageLayout = new QGridLayout();
     this->setLayout(m_pSettingsPageLayout);
 
     m_pComPortSelectionBox = new QComboBox();
 
-    m_lPorts = listPorts();
+    m_lPorts               = listPorts();
     m_pComPortSelectionBox->addItems(m_lPorts);
 
     m_pComPortConnectButton = new QPushButton("Connect");
@@ -31,7 +32,7 @@ QList<QString> settingsPage::listPorts()
     std::array<char, 128> buffer;
 
 #ifdef __linux__
-    FILE *pipe = popen("ls /dev/ttyA*", "r"); // Open pipe for reading
+    FILE* pipe = popen("ls /dev/ttyA*", "r");    // Open pipe for reading
     if (!pipe)
     {
         qDebug("Error: popen() failed!");
@@ -40,11 +41,11 @@ QList<QString> settingsPage::listPorts()
     {
         while (fgets(buffer.data(), buffer.size(), pipe) != nullptr)
         {
-            result.push_back(((QString)buffer.data()).trimmed());
+            result.push_back(((QString) buffer.data()).trimmed());
         }
     }
     if (pipe)
-        pclose(pipe); // Close the pipe
+        pclose(pipe);    // Close the pipe
 #elif __windows__
     qDebug("On Windows");
     // TODO: Implement Windows version of listPorts()
@@ -58,28 +59,27 @@ QList<QString> settingsPage::listPorts()
 
 int settingsPage::connectPnPMachine(QString comPort, QString csvFile)
 {
-
     return 0;
 }
 
 void settingsPage::onComPortSetButtonClicked()
 {
     QString comPortSelectionBoxText = m_pComPortSelectionBox->currentText().trimmed();
-    QByteArray array = comPortSelectionBoxText.toLocal8Bit();
-    m_sComPort = comPortSelectionBoxText.toStdString();
+    QByteArray array                = comPortSelectionBoxText.toLocal8Bit();
+    m_sComPort                      = comPortSelectionBoxText.toStdString();
 
     qDebug() << "Connect Port: |" << m_sComPort.c_str() << "|";
 
-    m_pPnPRunner_instance = std::make_unique<PnPRunner>(m_sComPort.c_str());
+    // m_pPnPRunner_instance = std::make_unique<PnPRunner>(m_sComPort.c_str());
 
-    if (m_pPnPRunner_instance->getPnPMachine()->getState() == IDLE)
-    {
-        m_pComPortConnectButton->setStyleSheet("background-color: green;");
-        m_pPnPRunner_instance->Start();
-    }
-    else
-    {
-        m_pComPortConnectButton->setStyleSheet("background-color: red;");
-        m_pPnPRunner_instance->RequestStop();
-    }
+    // if (m_pPnPRunner_instance->getPnPMachine()->getState() == IDLE)
+    // {
+    //     m_pComPortConnectButton->setStyleSheet("background-color: green;");
+    //     m_pPnPRunner_instance->Start();
+    // }
+    // else
+    // {
+    //     m_pComPortConnectButton->setStyleSheet("background-color: red;");
+    //     m_pPnPRunner_instance->RequestStop();
+    // }
 }

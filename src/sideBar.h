@@ -1,35 +1,37 @@
 #pragma once
 
-#include <QLayout>
+#include <QDebug>
 #include <QGridLayout>
 #include <QLabel>
+#include <QLayout>
 #include <QPushButton>
-#include <QDebug>
 
 #include <memory>
-#include "pnpRunner.h"
+
+// #include "pnpRunner.h"
 
 class sideBar : public QWidget
 {
-    Q_OBJECT
+        Q_OBJECT
 
-public:
-    sideBar(std::shared_ptr<PnPRunner> pPnPRunner_instance, QWidget *parent = nullptr);
-    ~sideBar();
+    public:
+        // std::shared_ptr<PnPRunner> pPnPRunner_instance
+        sideBar(QWidget* parent = nullptr);
+        ~sideBar();
 
-private:
-    QGridLayout* m_pSideBarLayout;
-    QLabel* m_pStateLabel;
-    QLabel* m_pConnectionStatusLabel;
-    QLabel* m_pPositionLabel;
-    QLabel* m_pCurrentComponentLabel;
-    QLabel* m_pCurrentJobLabel;
-    QPushButton* m_pPauseButton;
-    QPushButton* m_pStartEndProgramButton;
+    private:
+        QGridLayout* m_pSideBarLayout;
+        QLabel* m_pStateLabel;
+        QLabel* m_pConnectionStatusLabel;
+        QLabel* m_pPositionLabel;
+        QLabel* m_pCurrentComponentLabel;
+        QLabel* m_pCurrentJobLabel;
+        QPushButton* m_pPauseButton;
+        QPushButton* m_pStartEndProgramButton;
 
-    std::shared_ptr<PnPRunner> m_pPnPRunner_instance;
+        // std::shared_ptr<PnPRunner> m_pPnPRunner_instance;
 
-private slots:
-    void onPauseButtonClicked();
-    void onStartEndProgramButtonClicked();
+    private slots:
+        void onPauseButtonClicked();
+        void onStartEndProgramButtonClicked();
 };

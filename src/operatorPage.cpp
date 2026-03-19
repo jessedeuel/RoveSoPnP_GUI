@@ -8,7 +8,9 @@
 #include "vision/algorithms/FicucialDetector.hpp"
 #include "vision/algorithms/VisualHoming.hpp"
 
-operatorPage::operatorPage(std::shared_ptr<PnPRunner> pnpRunner, QWidget* parent) : QWidget(parent), m_pPnPRunner_instance(pnpRunner), m_eVisionMode(VisionMode::None)
+// std::shared_ptr<PnPRunner> pnpRunner
+// m_pPnPRunner_instance(pnpRunner)
+operatorPage::operatorPage(QWidget* parent) : QWidget(parent), m_eVisionMode(VisionMode::None)
 {
     m_pOperatorPageLayout = new QGridLayout(this);
 
@@ -121,80 +123,80 @@ operatorPage::~operatorPage()
 // --- User Interaction Hooks ---
 void operatorPage::onHomeClicked()
 {
-    m_pPnPRunner_instance->CommandHomeMachine();
+    // m_pPnPRunner_instance->CommandHomeMachine();
 }
 
 void operatorPage::onCalibrateClicked()
 {
-    m_pPnPRunner_instance->CommandCalibrateVision();
+    // m_pPnPRunner_instance->CommandCalibrateVision();
 }
 
 void operatorPage::onStartJobClicked()
 {
-    m_pPnPRunner_instance->CommandStartJob("board/CoreBoard-all-pos.csv");
+    // m_pPnPRunner_instance->CommandStartJob("board/CoreBoard-all-pos.csv");
 }
 
 void operatorPage::onAbortClicked()
 {
-    m_pPnPRunner_instance->CommandAbort();
+    // m_pPnPRunner_instance->CommandAbort();
 }
 
 void operatorPage::onPauseClicked()
 {
-    if (m_pPnPRunner_instance->GetCurrentState() == MachineState::RUNNING_JOB)
-    {
-        m_pPnPRunner_instance->CommandPauseJob();
-    }
-    else if (m_pPnPRunner_instance->GetCurrentState() == MachineState::PAUSED)
-    {
-        m_pPnPRunner_instance->CommandResumeJob();
-    }
+    // if (m_pPnPRunner_instance->GetCurrentState() == MachineState::RUNNING_JOB)
+    // {
+    //     m_pPnPRunner_instance->CommandPauseJob();
+    // }
+    // else if (m_pPnPRunner_instance->GetCurrentState() == MachineState::PAUSED)
+    // {
+    //     m_pPnPRunner_instance->CommandResumeJob();
+    // }
 }
 
 // --- Main Update Loop ---
 void operatorPage::updateUIAndCamera()
 {
     // 1. Update UI Status based on PnPRunner State
-    MachineState currentState = m_pPnPRunner_instance->GetCurrentState();
+    // MachineState currentState = m_pPnPRunner_instance->GetCurrentState();
 
-    switch (currentState)
-    {
-        case MachineState::DISCONNECTED:
-            m_pStateLabel->setText("State: DISCONNECTED");
-            m_pStateLabel->setStyleSheet("color: red;");
-            break;
-        case MachineState::IDLE:
-            m_pStateLabel->setText("State: IDLE");
-            m_pStateLabel->setStyleSheet("color: green;");
-            break;
-        case MachineState::HOMING:
-            m_pStateLabel->setText("State: HOMING");
-            m_pStateLabel->setStyleSheet("color: orange;");
-            break;
-        case MachineState::VISION_CALIBRATION:
-            m_pStateLabel->setText("State: CALIBRATING VISION");
-            m_pStateLabel->setStyleSheet("color: orange;");
-            break;
-        case MachineState::RUNNING_JOB:
-            m_pStateLabel->setText("State: RUNNING JOB");
-            m_pStateLabel->setStyleSheet("color: blue;");
-            break;
-        case MachineState::PAUSED:
-            m_pStateLabel->setText("State: PAUSED");
-            m_pStateLabel->setStyleSheet("color: orange;");
-            break;
-        case MachineState::ERROR_STATE:
-            m_pStateLabel->setText("State: ERROR");
-            m_pStateLabel->setStyleSheet("color: red;");
-            break;
-    }
+    // switch (currentState)
+    // {
+    //     case MachineState::DISCONNECTED:
+    //         m_pStateLabel->setText("State: DISCONNECTED");
+    //         m_pStateLabel->setStyleSheet("color: red;");
+    //         break;
+    //     case MachineState::IDLE:
+    //         m_pStateLabel->setText("State: IDLE");
+    //         m_pStateLabel->setStyleSheet("color: green;");
+    //         break;
+    //     case MachineState::HOMING:
+    //         m_pStateLabel->setText("State: HOMING");
+    //         m_pStateLabel->setStyleSheet("color: orange;");
+    //         break;
+    //     case MachineState::VISION_CALIBRATION:
+    //         m_pStateLabel->setText("State: CALIBRATING VISION");
+    //         m_pStateLabel->setStyleSheet("color: orange;");
+    //         break;
+    //     case MachineState::RUNNING_JOB:
+    //         m_pStateLabel->setText("State: RUNNING JOB");
+    //         m_pStateLabel->setStyleSheet("color: blue;");
+    //         break;
+    //     case MachineState::PAUSED:
+    //         m_pStateLabel->setText("State: PAUSED");
+    //         m_pStateLabel->setStyleSheet("color: orange;");
+    //         break;
+    //     case MachineState::ERROR_STATE:
+    //         m_pStateLabel->setText("State: ERROR");
+    //         m_pStateLabel->setStyleSheet("color: red;");
+    //         break;
+    // }
 
-    // Dynamic Button Toggling
-    m_pHomeBtn->setEnabled(currentState == MachineState::IDLE || currentState == MachineState::ERROR_STATE);
-    m_pCalibrateVisionBtn->setEnabled(currentState == MachineState::IDLE);
-    m_pStartJobBtn->setEnabled(currentState == MachineState::IDLE);
-    m_pPauseBtn->setEnabled(currentState == MachineState::RUNNING_JOB || currentState == MachineState::PAUSED);
-    m_pPauseBtn->setText(currentState == MachineState::PAUSED ? "Resume" : "Pause");
+    // // Dynamic Button Toggling
+    // m_pHomeBtn->setEnabled(currentState == MachineState::IDLE || currentState == MachineState::ERROR_STATE);
+    // m_pCalibrateVisionBtn->setEnabled(currentState == MachineState::IDLE);
+    // m_pStartJobBtn->setEnabled(currentState == MachineState::IDLE);
+    // m_pPauseBtn->setEnabled(currentState == MachineState::RUNNING_JOB || currentState == MachineState::PAUSED);
+    // m_pPauseBtn->setText(currentState == MachineState::PAUSED ? "Resume" : "Pause");
 
     // 2. Update Camera Feed
     if (!m_pGantryCam || m_pGantryCam->GetThreadState() != Thread<void>::ThreadState::eRunning)
@@ -269,24 +271,24 @@ void operatorPage::onGCodeSendButtonClicked()
     QString gcode = m_pGCodeEntryTextBox->toPlainText();
     qDebug() << "GCode to send:" << gcode;
 
-    if (this->m_pPnPRunner_instance == nullptr)
-    {
-        qDebug() << "PnPRunner not instantiated.";
-        QMessageBox msgBox;
-        msgBox.setText("Machine not connected.");
-        msgBox.exec();
-    }
-    else
-    {
-        if (this->m_pPnPRunner_instance->GetCurrentState() == MachineState::IDLE)
-        {
-            qDebug() << "PnP is currently IDLE. Sending GCode command.";
-            this->m_pPnPRunner_instance->sendGCode(gcode.toStdString());
-        }
-        else
-        {
-            qDebug() << "PnP is currently not IDLE. Current state:" << QString::fromStdString(m_pPnPRunner_instance->GetCurrentStateString())
-                     << ". GCode command cannot be sent.";
-        }
-    }
+    // if (this->m_pPnPRunner_instance == nullptr)
+    // {
+    //     qDebug() << "PnPRunner not instantiated.";
+    //     QMessageBox msgBox;
+    //     msgBox.setText("Machine not connected.");
+    //     msgBox.exec();
+    // }
+    // else
+    // {
+    //     if (this->m_pPnPRunner_instance->GetCurrentState() == MachineState::IDLE)
+    //     {
+    //         qDebug() << "PnP is currently IDLE. Sending GCode command.";
+    //         this->m_pPnPRunner_instance->sendGCode(gcode.toStdString());
+    //     }
+    //     else
+    //     {
+    //         qDebug() << "PnP is currently not IDLE. Current state:" << QString::fromStdString(m_pPnPRunner_instance->GetCurrentStateString())
+    //                  << ". GCode command cannot be sent.";
+    //     }
+    // }
 }

@@ -60,8 +60,8 @@ void jobsPage::onUploadJobButtonClicked()
     // TODO: Update to go through pnp class when components class is integrated
     Components components(m_sJobFilePath.c_str());
 
-    map<tuple<string, cuttape_t>, vector<component_t>> component_map = components.getPlacementMap();
-    int i                                                            = 0;
+    std::map<std::tuple<std::string, cuttape_t>, std::vector<component_t>> component_map = components.getPlacementMap();
+    int i                                                                                = 0;
 
     qDebug() << "Size of map:" << component_map.size();
     m_pJobsTable->setRowCount(component_map.size());
