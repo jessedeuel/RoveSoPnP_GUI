@@ -9,6 +9,8 @@
 #include <QTextEdit>
 #include <QWidget>
 
+#include <map>
+
 class jobsPage : public QWidget
 {
         Q_OBJECT
