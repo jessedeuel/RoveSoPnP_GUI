@@ -70,7 +70,6 @@
                 "codezombiech.gitignore",
                 "cschlosser.doxdocgen",
                 "gruntfuggly.todo-tree",
-                "streetsidesoftware.code-spell-checker",
                 "vscode-icons-team.vscode-icons",
                 "ryanluker.vscode-coverage-gutters",
                 "GitHub.vscode-pull-request-github",
@@ -278,18 +277,6 @@
                         "background": "#ccd514"
                     }
                 },
-                // Spell Checker Extension Settings.
-                "cSpell.customDictionaries": {
-                    "project-words": {
-                        "name": "-Project-Words",
-                        "path": "${workspaceRoot}/data/Custom_Dictionaries/-Dictionary.txt",
-                        "description": "Words used in the RoveSoPNP project",
-                        "addWords": true
-                    },
-                    "custom": true, // Enable the `custom` dictionary
-                    "internal-terms": false // Disable the `internal-terms` dictionary
-                },
-                "cSpell.spellCheckOnlyWorkspaceFiles": true,
                 // Coverage Gutters Extension Settings.
                 "coverage-gutters.coverageFileNames": [
                     "lcov.info",
