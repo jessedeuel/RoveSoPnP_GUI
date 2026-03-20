@@ -83,5 +83,3 @@ CMakeLists.txt.user*
 .rcc/
 .uic/
 build/
-
-devcontainer.json

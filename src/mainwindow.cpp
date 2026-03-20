@@ -7,6 +7,7 @@
 
 #include "Logging.h"
 #include "customMenuBar.h"
+#include "debugPnPTestPage.h"
 #include "jobsPage.h"
 #include "operatorPage.h"
 #include "settingsPage.h"
@@ -26,15 +27,17 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     customMenuBar* menuBar_instance = new customMenuBar(this);
     this->setMenuBar(menuBar_instance);
 
-    sideBar* sideBar_instance           = new sideBar(this);
-    jobsPage* jobsPage_instance         = new jobsPage(this);
-    operatorPage* operatorPage_instance = new operatorPage(this);
-    settingsPage* settingsPage_instance = new settingsPage(this);
+    sideBar* sideBar_instance            = new sideBar(this);
+    jobsPage* jobsPage_instance          = new jobsPage(this);
+    operatorPage* operatorPage_instance  = new operatorPage(this);
+    settingsPage* settingsPage_instance  = new settingsPage(this);
+    debugPnPTestPage* debugPage_instance = new debugPnPTestPage(this);
 
-    QTabWidget* tabs                    = new QTabWidget();
+    QTabWidget* tabs                     = new QTabWidget();
     tabs->addTab(jobsPage_instance, "Jobs");
     tabs->addTab(operatorPage_instance, "Operation");
     tabs->addTab(settingsPage_instance, "Settings");
+    tabs->addTab(debugPage_instance, "Debug FC Test");
 
     mainLayout->addWidget(sideBar_instance, 0, 0);
     mainLayout->addWidget(tabs, 0, 1);
