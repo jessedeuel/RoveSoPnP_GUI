@@ -130,16 +130,28 @@ ENV QT_EMAIL=$QT_EMAIL
 ARG QT_PASSWD
 ENV QT_PASSWD=$QT_PASSWD
 ARG QT_INSTALL_DIR="/opt/Qt"
+ARG TARGETARCH
 
+RUN echo "$TARGETARCH"
 RUN echo "Qt email: ${QT_EMAIL}"
 RUN echo "Qt passwd: ${QT_PASSWD}"
 RUN echo "Qt install dir: ${QT_INSTALL_DIR}"
 
-RUN wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run && \
+RUN if [ "$TARGETARCH" = "amd64" ]; then \
+    wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run && \
     chmod +x qt-online-installer-linux-x64-online.run && \
     ./qt-online-installer-linux-x64-online.run --root ${QT_INSTALL_DIR} --accept-licenses --accept-obligations \
     --confirm-command --email ${QT_EMAIL} --pw ${QT_PASSWD} --accept-messages --essential \
-    install qt6.9.3-essentials qt.qt6.693.addons.qtmultimedia 
+    install qt6.9.3-essentials qt.qt6.693.addons.qtmultimedia; \
+    elif [ "$TARGETARCH" = "arm64" ]; then \
+    wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-arm64-online.run && \
+    chmod +x qt-online-installer-linux-arm64-online.run && \
+    ./qt-online-installer-linux-arm64-online.run --root ${QT_INSTALL_DIR} --accept-licenses --accept-obligations \
+    --confirm-command --email ${QT_EMAIL} --pw ${QT_PASSWD} --accept-messages --essential \
+    install qt6.9.3-essentials qt.qt6.693.addons.qtmultimedia; \
+    else \
+    echo "Unsupported architecture"; \
+    fi
 
 RUN cd ${QT_INSTALL_DIR} && \
     ./MaintenanceTool clear-cache && \
