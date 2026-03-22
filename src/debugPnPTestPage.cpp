@@ -151,8 +151,7 @@ void debugPnPTestPage::onConnectClicked()
     try
     {
         // 1. Initialize the shared GRBL Controller and setup comms
-        m_grbl = std::make_shared<GRBL>();
-        m_grbl->comm.setupComm(port.toStdString().c_str());
+        m_grbl = std::make_shared<GRBL>(port.toStdString().c_str());
 
         // 2. Instantiate the debug page's own hardware interfaces
         m_gantry = std::make_unique<Gantry>(m_grbl);
