@@ -33,21 +33,21 @@
     "mounts": [
         "type=bind,readonly,source=/etc/localtime,target=/etc/localtime"
     ],
-    "image": "jessedeuel/rovesopnp_gui:latest",
-    // "build": {
-    //     "dockerfile": "Ubuntu.dockerfile",
-    //     "args": {
-    //         "QT_EMAIL": "${localEnv:QT_EMAIL}",
-    //         "QT_PASSWD": "${localEnv:QT_PASSWD}"
-    //     },
-    //     "options": [
-    //         "--progress=plain"
-    //         // "-e",
-    //         // "QT_EMAIL",
-    //         // "-e",
-    //         // "QT_PASSWD"
-    //     ]
-    // },
+    // "image": "jessedeuel/rovesopnp_gui:latest",
+    "build": {
+        "dockerfile": "Ubuntu.dockerfile",
+        "args": {
+            "QT_EMAIL": "claytonraycowen@gmail.com",
+            "QT_PASSWD": "Bronco-Grievous-Haphazard-Alienate-Grid-Shrank1"
+        },
+        "options": [
+            "--progress=plain"
+            // "-e",
+            // "QT_EMAIL",
+            // "-e",
+            // "QT_PASSWD"
+        ]
+    },
     // Features to add to the dev container. More info: https://containers.dev/features.
     // "features": {},
     // Use 'forwardPorts' to make a list of ports inside the container available locally.

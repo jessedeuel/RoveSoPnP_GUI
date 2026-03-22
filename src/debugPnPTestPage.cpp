@@ -14,7 +14,7 @@ debugPnPTestPage::debugPnPTestPage(QWidget* parent) : QWidget(parent)
     QGroupBox* connGroup    = new QGroupBox("Connection", this);
     QHBoxLayout* connLayout = new QHBoxLayout(connGroup);
     m_pComPortEdit          = new QLineEdit("/dev/ttyUSB0", this);
-    m_pConnectBtn           = new QPushButton("Init FlowControl", this);
+    m_pConnectBtn           = new QPushButton("Init Hardware", this);
     connLayout->addWidget(new QLabel("COM Port:"));
     connLayout->addWidget(m_pComPortEdit);
     connLayout->addWidget(m_pConnectBtn);
@@ -108,7 +108,7 @@ debugPnPTestPage::debugPnPTestPage(QWidget* parent) : QWidget(parent)
     // ==========================================
     QGroupBox* stateGroup    = new QGroupBox("Flow Control State Machine", this);
     QHBoxLayout* stateLayout = new QHBoxLayout(stateGroup);
-    m_pAdvanceCompBtn        = new QPushButton("Advance Component", this);
+    m_pAdvanceCompBtn        = new QPushButton("Set Next Comp State", this);
     m_pTickStateBtn          = new QPushButton("Tick State Machine", this);
     stateLayout->addWidget(m_pAdvanceCompBtn);
     stateLayout->addWidget(m_pTickStateBtn);
@@ -137,9 +137,9 @@ debugPnPTestPage::~debugPnPTestPage() {}
 
 bool debugPnPTestPage::checkConnection()
 {
-    if (!m_pFlowControl)
+    if (!m_grbl)
     {
-        QMessageBox::warning(this, "Not Connected", "Please initialize FlowControl first.");
+        QMessageBox::warning(this, "Not Connected", "Please initialize the hardware first.");
         return false;
     }
     return true;
@@ -148,136 +148,125 @@ bool debugPnPTestPage::checkConnection()
 void debugPnPTestPage::onConnectClicked()
 {
     QString port = m_pComPortEdit->text();
-    // FlowControl does a thread sleep on init, this will block UI briefly
     try
     {
-        m_pFlowControl = std::make_unique<FlowControl>(port.toStdString().c_str());
+        // 1. Initialize the shared GRBL Controller and setup comms
+        m_grbl = std::make_shared<GRBL>();
+        m_grbl->comm.setupComm(port.toStdString().c_str());
+
+        // 2. Instantiate the debug page's own hardware interfaces
+        m_gantry = std::make_unique<Gantry>(m_grbl);
+        m_head   = std::make_unique<Head>(m_grbl);
+        m_feeder = std::make_unique<Feeder>(m_grbl);
+        m_led1   = std::make_unique<LED>(m_grbl);
+        m_led2   = std::make_unique<LED>(m_grbl);
+
+        // 3. Initialize the state machine for the testing buttons (passing null for cameras)
+        m_pFlowControl = std::make_unique<FlowControl>(m_grbl, nullptr, nullptr);
+
         m_pConnectBtn->setText("Connected");
         m_pConnectBtn->setStyleSheet("background-color: green; color: white;");
     }
     catch (...)
     {
-        QMessageBox::critical(this, "Error", "Failed to initialize FlowControl on port " + port);
+        QMessageBox::critical(this, "Error", "Failed to connect to GRBL on port " + port);
     }
 }
 
 void debugPnPTestPage::onMoveXYClicked()
 {
     if (!checkConnection())
-    {
         return;
-    }
-    m_pFlowControl->gantry->setGlobalPosition(m_pXSpin->value(), m_pYSpin->value());
+    m_gantry->setGlobalPosition(m_pXSpin->value(), m_pYSpin->value());
 }
 
 void debugPnPTestPage::onMoveZClicked()
 {
     if (!checkConnection())
-    {
         return;
-    }
-    m_pFlowControl->gantry->setHeadHeight(m_pZSpin->value());
+    m_gantry->setHeadHeight(m_pZSpin->value());
 }
 
 void debugPnPTestPage::onHomeGantryClicked()
 {
     if (!checkConnection())
-    {
         return;
-    }
-    m_pFlowControl->gantry->home();
+    m_gantry->home();
 }
 
 void debugPnPTestPage::onRotateHeadClicked()
 {
     if (!checkConnection())
-    {
         return;
-    }
-    m_pFlowControl->head->increment(m_pHeadAngleSpin->value());
+    m_head->increment(m_pHeadAngleSpin->value());
 }
 
 void debugPnPTestPage::onVacuumOnClicked()
 {
     if (!checkConnection())
-    {
         return;
-    }
-    m_pFlowControl->head->vacuumOn();
+    m_head->vacuumOn();
 }
 
 void debugPnPTestPage::onVacuumOffClicked()
 {
     if (!checkConnection())
-    {
         return;
-    }
-    m_pFlowControl->head->vacuumOff();
+    m_head->vacuumOff();
 }
 
 void debugPnPTestPage::onFeedClicked()
 {
     if (!checkConnection())
-    {
         return;
-    }
-    m_pFlowControl->feeder->increment(m_pFeederLengthSpin->value());
+    m_feeder->increment(m_pFeederLengthSpin->value());
 }
 
 void debugPnPTestPage::onLed1OnClicked()
 {
     if (!checkConnection())
-    {
         return;
-    }
-    m_pFlowControl->led1->setColor(static_cast<LED_COLOR>(m_pLedColorCombo->currentIndex()));
-    m_pFlowControl->led1->setOn();
+    m_led1->setColor(static_cast<LED_COLOR>(m_pLedColorCombo->currentIndex()));
+    m_led1->setOn();
 }
 
 void debugPnPTestPage::onLed1OffClicked()
 {
     if (!checkConnection())
-    {
         return;
-    }
-    m_pFlowControl->led1->setOff();
+    m_led1->setOff();
 }
 
 void debugPnPTestPage::onLed2OnClicked()
 {
     if (!checkConnection())
-    {
         return;
-    }
-    m_pFlowControl->led2->setColor(static_cast<LED_COLOR>(m_pLedColorCombo->currentIndex()));
-    m_pFlowControl->led2->setOn();
+    m_led2->setColor(static_cast<LED_COLOR>(m_pLedColorCombo->currentIndex()));
+    m_led2->setOn();
 }
 
 void debugPnPTestPage::onLed2OffClicked()
 {
     if (!checkConnection())
-    {
         return;
-    }
-    m_pFlowControl->led2->setOff();
+    m_led2->setOff();
 }
 
 void debugPnPTestPage::onAdvanceCompClicked()
 {
-    if (!checkConnection())
-    {
+    if (!checkConnection() || !m_pFlowControl)
         return;
-    }
-    FlowControlState nextState = m_pFlowControl->advanceComponent();
-    qDebug() << "Advanced Component. State machine next state evaluated as:" << static_cast<int>(nextState);
+
+    // Set the state directly using the new FlowState enum
+    m_pFlowControl->setState(FlowState::GET_NEXT_COMPONENT);
+    qDebug() << "Advanced Component. State machine set to GET_NEXT_COMPONENT";
 }
 
 void debugPnPTestPage::onTickStateClicked()
 {
-    if (!checkConnection())
-    {
+    if (!checkConnection() || !m_pFlowControl)
         return;
-    }
+
     m_pFlowControl->tickStateMachine();
     qDebug() << "Tick completed. Current State:" << static_cast<int>(m_pFlowControl->getState());
 }

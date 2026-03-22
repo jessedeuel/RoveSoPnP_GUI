@@ -1,8 +1,8 @@
-#pragma once
+#ifndef DEBUGPNPTESTPAGE_H
+#define DEBUGPNPTESTPAGE_H
 
 #include <QComboBox>
 #include <QDoubleSpinBox>
-#include <QGridLayout>
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -11,7 +11,13 @@
 #include <QWidget>
 #include <memory>
 
-#include "flowControl.hpp"
+// Hardware and Flow Control Includes
+#include "LED.hpp"
+#include "feeder.hpp"
+#include "flowControl.h"    // Ensure this matches the exact casing of your header file
+#include "gantry.hpp"
+#include "grbl.hpp"
+#include "head.hpp"
 
 class debugPnPTestPage : public QWidget
 {
@@ -20,45 +26,6 @@ class debugPnPTestPage : public QWidget
     public:
         explicit debugPnPTestPage(QWidget* parent = nullptr);
         ~debugPnPTestPage();
-
-    private:
-        std::unique_ptr<FlowControl> m_pFlowControl;
-
-        // UI Elements
-        QLineEdit* m_pComPortEdit;
-        QPushButton* m_pConnectBtn;
-
-        // Gantry Elements
-        QDoubleSpinBox* m_pXSpin;
-        QDoubleSpinBox* m_pYSpin;
-        QPushButton* m_pMoveXYBtn;
-        QDoubleSpinBox* m_pZSpin;
-        QPushButton* m_pMoveZBtn;
-        QPushButton* m_pHomeGantryBtn;
-
-        // Head Elements
-        QSpinBox* m_pHeadAngleSpin;
-        QPushButton* m_pRotateHeadBtn;
-        QPushButton* m_pVacuumOnBtn;
-        QPushButton* m_pVacuumOffBtn;
-
-        // Feeder Elements
-        QDoubleSpinBox* m_pFeederLengthSpin;
-        QPushButton* m_pFeedBtn;
-
-        // LED Elements
-        QComboBox* m_pLedColorCombo;
-        QPushButton* m_pLed1OnBtn;
-        QPushButton* m_pLed1OffBtn;
-        QPushButton* m_pLed2OnBtn;
-        QPushButton* m_pLed2OffBtn;
-
-        // State Machine Elements
-        QPushButton* m_pTickStateBtn;
-        QPushButton* m_pAdvanceCompBtn;
-
-        // Helper
-        bool checkConnection();
 
     private slots:
         void onConnectClicked();
@@ -73,6 +40,50 @@ class debugPnPTestPage : public QWidget
         void onLed1OffClicked();
         void onLed2OnClicked();
         void onLed2OffClicked();
-        void onTickStateClicked();
         void onAdvanceCompClicked();
+        void onTickStateClicked();
+
+    private:
+        bool checkConnection();
+
+        // --- UI Elements ---
+        QLineEdit* m_pComPortEdit;
+        QPushButton* m_pConnectBtn;
+
+        QDoubleSpinBox* m_pXSpin;
+        QDoubleSpinBox* m_pYSpin;
+        QPushButton* m_pMoveXYBtn;
+
+        QDoubleSpinBox* m_pZSpin;
+        QPushButton* m_pMoveZBtn;
+        QPushButton* m_pHomeGantryBtn;
+
+        QSpinBox* m_pHeadAngleSpin;
+        QPushButton* m_pRotateHeadBtn;
+        QPushButton* m_pVacuumOnBtn;
+        QPushButton* m_pVacuumOffBtn;
+
+        QDoubleSpinBox* m_pFeederLengthSpin;
+        QPushButton* m_pFeedBtn;
+
+        QComboBox* m_pLedColorCombo;
+        QPushButton* m_pLed1OnBtn;
+        QPushButton* m_pLed1OffBtn;
+        QPushButton* m_pLed2OnBtn;
+        QPushButton* m_pLed2OffBtn;
+
+        QPushButton* m_pAdvanceCompBtn;
+        QPushButton* m_pTickStateBtn;
+
+        // --- Hardware Control Instances ---
+        std::shared_ptr<GRBL> m_grbl;
+        std::unique_ptr<Gantry> m_gantry;
+        std::unique_ptr<Head> m_head;
+        std::unique_ptr<Feeder> m_feeder;
+        std::unique_ptr<LED> m_led1;
+        std::unique_ptr<LED> m_led2;
+
+        std::unique_ptr<FlowControl> m_pFlowControl;
 };
+
+#endif    // DEBUGPNPTESTPAGE_H

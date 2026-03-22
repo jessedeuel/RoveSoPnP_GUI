@@ -3,6 +3,7 @@
 #include <QImage>
 #include <QMessageBox>
 #include <QPixmap>
+#include <QTimer>    // Added QTimer include
 
 #include "vision/algorithms/ComponentDetector.hpp"
 #include "vision/algorithms/FicucialDetector.hpp"
@@ -99,7 +100,15 @@ operatorPage::operatorPage(QWidget* parent) : QWidget(parent), m_eVisionMode(Vis
     // ==========================================
     try
     {
-        m_pGantryCam = std::make_unique<BasicCam>("/dev/video0", 640, 480, 30, PIXEL_FORMATS::eBGR, 90.0, 90.0, false, 1);
+        m_pGantryCam = std::make_unique<BasicCam>("/dev/v4l/by-id/usb-SunplusIT_Inc_USB_2.0_Camera_20201211V0-video-index0",
+                                                  640,
+                                                  480,
+                                                  30,
+                                                  PIXEL_FORMATS::eBGR,
+                                                  90.0,
+                                                  90.0,
+                                                  false,
+                                                  1);
         qDebug() << "Camera opened successfully. Starting camera thread...";
         m_pGantryCam->Start();
     }
@@ -107,6 +116,11 @@ operatorPage::operatorPage(QWidget* parent) : QWidget(parent), m_eVisionMode(Vis
     {
         m_pCameraDisplayLabel->setText("Camera Error");
     }
+
+    // --- Added Timer Setup ---
+    QTimer* updateTimer = new QTimer(this);
+    connect(updateTimer, &QTimer::timeout, this, &operatorPage::updateUIAndCamera);
+    updateTimer->start(33);    // Check for new frames at ~30 FPS
 
     qDebug() << "operatorPage initialized.";
 }

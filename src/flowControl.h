@@ -1,0 +1,141 @@
+#ifndef GUI_FLOWCONTROL_H
+#define GUI_FLOWCONTROL_H
+
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <vector>
+
+// --- Low-Level Hardware ---
+#include "../libdeps/RoveSoPnP_FlowControl/include/board.hpp"
+#include "../libdeps/RoveSoPnP_FlowControl/include/feeder.hpp"
+#include "../libdeps/RoveSoPnP_FlowControl/include/gantry.hpp"
+#include "../libdeps/RoveSoPnP_FlowControl/include/grbl.hpp"
+#include "../libdeps/RoveSoPnP_FlowControl/include/head.hpp"
+#include "../libdeps/RoveSoPnP_FlowControl/include/tapeLookup.hpp"
+
+// --- Vision Library ---
+#include "../libdeps/RoveSoPnP_Vision/src/vision/algorithms/ComponentDetector.hpp"
+#include "../libdeps/RoveSoPnP_Vision/src/vision/algorithms/FicucialDetector.hpp"
+#include "../libdeps/RoveSoPnP_Vision/src/vision/algorithms/PixelTo3D.hpp"
+#include "../libdeps/RoveSoPnP_Vision/src/vision/cameras/BasicCam.h"
+#include <opencv2/opencv.hpp>
+
+enum class FlowState
+{
+    // --- System States ---
+    IDLE,
+    RUNNING,
+    JOB_FAILED,
+
+    // --- Vision Calibration Sequence ---
+    BOARD_DETECT_SAFE_START_STATE,
+    CALIBRATION_HOME,
+    CALIBRATION_HOMING,
+    MOVE_Z_SAFE_CALIBRATION,
+    MOVE_TO_FIDUCIAL_1,
+    DETECT_FIDUCIAL_1,
+    MOVE_TO_FIDUCIAL_2,
+    DETECT_FIDUCIAL_2,
+    MOVE_TO_FIDUCIAL_3,
+    DETECT_FIDUCIAL_3,
+    MOVE_TO_FIDUCIAL_4,
+    DETECT_FIDUCIAL_4,
+    CALCULATE_BOARD_TRANSFORM,
+
+    // --- Pick and Place Job Sequence ---
+    FEEDER_SAFE_START_STATE,
+    GET_NEXT_COMPONENT,
+    WAIT_FOR_USER_CUTTAPE_RELOAD,
+    ADVANCE_FEEDER,
+    PNP_HOME,
+    PNP_HOMING,
+    PICKUP_SAFE_START_STATE,
+    MOVE_Z_SAFE_PICK,
+    MOVE_XY_TO_FEEDER,
+    LOWER_Z_TO_PICK,
+    ENABLE_VACUUM,
+    DWELL_FOR_VACUUM,
+    RAISE_Z_FROM_PICK,
+    PLACE_DETECT_SAFE_START_STATE,
+    MOVE_XY_TO_UPWARD_CAMERA,
+    DETECT_COMPONENT_POSE,
+    MOVING_TO_CORRECTED_POSITION,
+    ROTATE_HEAD_A_AXIS,
+    LOWER_Z_TO_DROP,
+    DISABLE_VACUUM,
+    DWELL_FOR_RELEASE,
+    RAISE_Z_FROM_DROP,
+
+    // --- Error Handling & Interrupts ---
+    PAUSE,
+    AWAIT_OPERATOR_RESUME,
+    MACHINE_IS_STUPID
+};
+
+class FlowControl
+{
+    private:
+        std::shared_ptr<GRBL> grbl;
+        std::unique_ptr<Head> head;
+        std::unique_ptr<Gantry> gantry;
+        std::unique_ptr<Feeder> feeder;
+
+        // Vision Components
+        std::shared_ptr<BasicCam> m_gantryCam;
+        std::shared_ptr<BasicCam> m_upwardCam;
+        cv::Mat m_cvCurrentFrame;
+        CameraConfig m_gantryCamConfig;    // Setup with your real K/D matrices
+        std::vector<cv::Point3d> m_fiducialWorldCoords;
+
+        // State management
+        FlowState m_currentState  = FlowState::IDLE;
+        FlowState m_previousState = FlowState::IDLE;
+
+        // Timers for dwells
+        std::chrono::steady_clock::time_point m_dwellStartTime;
+
+        // Job Data
+        struct ComponentData
+        {
+                float feeder_x, feeder_y;
+                float pickup_z;
+                float place_x, place_y;
+                float place_z;
+                float tape_pitch;
+        } current_component;
+
+        // Computed Corrections
+        float m_correctedPlaceX      = 0.0f;
+        float m_correctedPlaceY      = 0.0f;
+        double m_correctedPlaceAngle = 0.0;
+
+        // Configuration
+        const float SAFE_Z_HEIGHT = 0.0f;
+        const int DWELL_TIME_MS   = 500;
+
+        // Status Flags (Set via GUI)
+        bool m_userConfirmsPosition    = false;
+        bool m_userConfirmsFeederReady = false;
+        bool m_userResumesMachine      = false;
+
+        // Helper to process a fiducial state
+        void processFiducialDetection(FlowState nextState);
+
+    public:
+        FlowControl(std::shared_ptr<GRBL> grbl_instance, std::shared_ptr<BasicCam> gantryCam, std::shared_ptr<BasicCam> upwardCam);
+        ~FlowControl();
+
+        void tickStateMachine();
+        void setState(FlowState state);
+
+        FlowState getState() const { return m_currentState; }
+
+        void setUserConfirmsPosition(bool confirmed) { m_userConfirmsPosition = confirmed; }
+
+        void setFeederReady(bool ready) { m_userConfirmsFeederReady = ready; }
+
+        void resumeMachine() { m_userResumesMachine = true; }
+};
+
+#endif    // GUI_FLOWCONTROL_H
