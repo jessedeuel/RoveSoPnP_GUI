@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QTimer>
 #include <QWidget>
 #include <memory>
 
@@ -24,11 +25,10 @@ class debugPnPTestPage : public QWidget
         Q_OBJECT
 
     public:
-        explicit debugPnPTestPage(QWidget* parent = nullptr);
+        explicit debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent = nullptr);
         ~debugPnPTestPage();
 
     private slots:
-        void onConnectClicked();
         void onMoveXYClicked();
         void onMoveZClicked();
         void onHomeGantryClicked();
@@ -43,13 +43,13 @@ class debugPnPTestPage : public QWidget
         void onAdvanceCompClicked();
         void onTickStateClicked();
 
+        // Slot for polling live values
+        void onUpdateValues();
+
     private:
         bool checkConnection();
 
         // --- UI Elements ---
-        QLineEdit* m_pComPortEdit;
-        QPushButton* m_pConnectBtn;
-
         QDoubleSpinBox* m_pXSpin;
         QDoubleSpinBox* m_pYSpin;
         QPushButton* m_pMoveXYBtn;
@@ -74,6 +74,10 @@ class debugPnPTestPage : public QWidget
 
         QPushButton* m_pAdvanceCompBtn;
         QPushButton* m_pTickStateBtn;
+
+        // Live Values UI Elements
+        QLabel* m_pGantryPosLabel;
+        QTimer* m_pUpdateTimer;
 
         // --- Hardware Control Instances ---
         std::shared_ptr<GRBL> m_grbl;

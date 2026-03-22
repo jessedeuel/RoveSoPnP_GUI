@@ -4,24 +4,12 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 
-debugPnPTestPage::debugPnPTestPage(QWidget* parent) : QWidget(parent)
+debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) : QWidget(parent), m_grbl(grbl)
 {
     QGridLayout* mainLayout = new QGridLayout(this);
 
     // ==========================================
-    // 1. Connection Group
-    // ==========================================
-    QGroupBox* connGroup    = new QGroupBox("Connection", this);
-    QHBoxLayout* connLayout = new QHBoxLayout(connGroup);
-    m_pComPortEdit          = new QLineEdit("/dev/ttyUSB0", this);
-    m_pConnectBtn           = new QPushButton("Init Hardware", this);
-    connLayout->addWidget(new QLabel("COM Port:"));
-    connLayout->addWidget(m_pComPortEdit);
-    connLayout->addWidget(m_pConnectBtn);
-    mainLayout->addWidget(connGroup, 0, 0, 1, 2);
-
-    // ==========================================
-    // 2. Gantry Group
+    // 1. Gantry Group
     // ==========================================
     QGroupBox* gantryGroup    = new QGroupBox("Gantry (X, Y, Z)", this);
     QGridLayout* gantryLayout = new QGridLayout(gantryGroup);
@@ -48,10 +36,10 @@ debugPnPTestPage::debugPnPTestPage(QWidget* parent) : QWidget(parent)
     gantryLayout->addWidget(m_pMoveZBtn, 1, 4);
 
     gantryLayout->addWidget(m_pHomeGantryBtn, 2, 0, 1, 5);
-    mainLayout->addWidget(gantryGroup, 1, 0);
+    mainLayout->addWidget(gantryGroup, 0, 0);
 
     // ==========================================
-    // 3. Head Group
+    // 2. Head Group
     // ==========================================
     QGroupBox* headGroup    = new QGroupBox("Head Controls", this);
     QGridLayout* headLayout = new QGridLayout(headGroup);
@@ -67,10 +55,10 @@ debugPnPTestPage::debugPnPTestPage(QWidget* parent) : QWidget(parent)
     headLayout->addWidget(m_pRotateHeadBtn, 0, 2);
     headLayout->addWidget(m_pVacuumOnBtn, 1, 0, 1, 2);
     headLayout->addWidget(m_pVacuumOffBtn, 1, 2);
-    mainLayout->addWidget(headGroup, 1, 1);
+    mainLayout->addWidget(headGroup, 0, 1);
 
     // ==========================================
-    // 4. Feeder Group
+    // 3. Feeder Group
     // ==========================================
     QGroupBox* feederGroup    = new QGroupBox("Feeder", this);
     QHBoxLayout* feederLayout = new QHBoxLayout(feederGroup);
@@ -80,10 +68,10 @@ debugPnPTestPage::debugPnPTestPage(QWidget* parent) : QWidget(parent)
     feederLayout->addWidget(new QLabel("Length:"));
     feederLayout->addWidget(m_pFeederLengthSpin);
     feederLayout->addWidget(m_pFeedBtn);
-    mainLayout->addWidget(feederGroup, 2, 0);
+    mainLayout->addWidget(feederGroup, 1, 0);
 
     // ==========================================
-    // 5. LED Group
+    // 4. LED Group
     // ==========================================
     QGroupBox* ledGroup    = new QGroupBox("LED Testing", this);
     QGridLayout* ledLayout = new QGridLayout(ledGroup);
@@ -101,10 +89,10 @@ debugPnPTestPage::debugPnPTestPage(QWidget* parent) : QWidget(parent)
     ledLayout->addWidget(m_pLed1OffBtn, 1, 2, 1, 2);
     ledLayout->addWidget(m_pLed2OnBtn, 2, 0, 1, 2);
     ledLayout->addWidget(m_pLed2OffBtn, 2, 2, 1, 2);
-    mainLayout->addWidget(ledGroup, 2, 1);
+    mainLayout->addWidget(ledGroup, 1, 1);
 
     // ==========================================
-    // 6. FlowControl State Machine
+    // 5. FlowControl State Machine
     // ==========================================
     QGroupBox* stateGroup    = new QGroupBox("Flow Control State Machine", this);
     QHBoxLayout* stateLayout = new QHBoxLayout(stateGroup);
@@ -112,12 +100,42 @@ debugPnPTestPage::debugPnPTestPage(QWidget* parent) : QWidget(parent)
     m_pTickStateBtn          = new QPushButton("Tick State Machine", this);
     stateLayout->addWidget(m_pAdvanceCompBtn);
     stateLayout->addWidget(m_pTickStateBtn);
-    mainLayout->addWidget(stateGroup, 3, 0, 1, 2);
+    mainLayout->addWidget(stateGroup, 2, 0);    // Placed in the bottom left
+
+    // ==========================================
+    // 6. Live Values Group
+    // ==========================================
+    QGroupBox* valuesGroup    = new QGroupBox("Live Hardware Values", this);
+    QVBoxLayout* valuesLayout = new QVBoxLayout(valuesGroup);
+
+    m_pGantryPosLabel         = new QLabel("Gantry: Disconnected", this);
+
+    // Add future labels (head, feeder) here when ready
+    valuesLayout->addWidget(m_pGantryPosLabel);
+    valuesLayout->addStretch();                  // Pushes the text to the top
+    mainLayout->addWidget(valuesGroup, 2, 1);    // Placed in the bottom right
+
+    // Setup polling timer
+    m_pUpdateTimer = new QTimer(this);
+    connect(m_pUpdateTimer, &QTimer::timeout, this, &debugPnPTestPage::onUpdateValues);
+
+    // Initialize hardware interfaces if GRBL is provided
+    if (m_grbl)
+    {
+        m_gantry       = std::make_unique<Gantry>(m_grbl);
+        m_head         = std::make_unique<Head>(m_grbl);
+        m_feeder       = std::make_unique<Feeder>(m_grbl);
+        m_led1         = std::make_unique<LED>(m_grbl);
+        m_led2         = std::make_unique<LED>(m_grbl);
+
+        m_pFlowControl = std::make_unique<FlowControl>(m_grbl, nullptr, nullptr);
+
+        m_pUpdateTimer->start(200);
+    }
 
     // ==========================================
     // Signal/Slot Connections
     // ==========================================
-    connect(m_pConnectBtn, &QPushButton::clicked, this, &debugPnPTestPage::onConnectClicked);
     connect(m_pMoveXYBtn, &QPushButton::clicked, this, &debugPnPTestPage::onMoveXYClicked);
     connect(m_pMoveZBtn, &QPushButton::clicked, this, &debugPnPTestPage::onMoveZClicked);
     connect(m_pHomeGantryBtn, &QPushButton::clicked, this, &debugPnPTestPage::onHomeGantryClicked);
@@ -139,37 +157,10 @@ bool debugPnPTestPage::checkConnection()
 {
     if (!m_grbl)
     {
-        QMessageBox::warning(this, "Not Connected", "Please initialize the hardware first.");
+        QMessageBox::warning(this, "Not Connected", "Hardware was not initialized properly.");
         return false;
     }
     return true;
-}
-
-void debugPnPTestPage::onConnectClicked()
-{
-    QString port = m_pComPortEdit->text();
-    try
-    {
-        // 1. Initialize the shared GRBL Controller and setup comms
-        m_grbl = std::make_shared<GRBL>(port.toStdString().c_str());
-
-        // 2. Instantiate the debug page's own hardware interfaces
-        m_gantry = std::make_unique<Gantry>(m_grbl);
-        m_head   = std::make_unique<Head>(m_grbl);
-        m_feeder = std::make_unique<Feeder>(m_grbl);
-        m_led1   = std::make_unique<LED>(m_grbl);
-        m_led2   = std::make_unique<LED>(m_grbl);
-
-        // 3. Initialize the state machine for the testing buttons (passing null for cameras)
-        m_pFlowControl = std::make_unique<FlowControl>(m_grbl, nullptr, nullptr);
-
-        m_pConnectBtn->setText("Connected");
-        m_pConnectBtn->setStyleSheet("background-color: green; color: white;");
-    }
-    catch (...)
-    {
-        QMessageBox::critical(this, "Error", "Failed to connect to GRBL on port " + port);
-    }
 }
 
 void debugPnPTestPage::onMoveXYClicked()
@@ -268,4 +259,16 @@ void debugPnPTestPage::onTickStateClicked()
 
     m_pFlowControl->tickStateMachine();
     qDebug() << "Tick completed. Current State:" << static_cast<int>(m_pFlowControl->getState());
+}
+
+void debugPnPTestPage::onUpdateValues()
+{
+    // Polled periodically by m_pUpdateTimer
+    if (m_gantry)
+    {
+        // Assuming getGlobalPosition returns a struct with .x and .y
+        // Change pos.x/pos.y to pos.first/pos.second if returning std::pair
+        auto pos = m_gantry->getGlobalPosition();
+        m_pGantryPosLabel->setText(QString("Gantry X: %1  |  Y: %2").arg(pos.x, 0, 'f', 2).arg(pos.y, 0, 'f', 2));
+    }
 }
