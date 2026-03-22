@@ -1,10 +1,11 @@
 #include "settingsPage.h"
 
-// std::shared_ptr<PnPRunner> pPnPRunner_instance
-settingsPage::settingsPage(QWidget* parent) : QWidget(parent)
+settingsPage::settingsPage(std::shared_ptr<GRBL>& GRBL_instance, QWidget* parent) : QWidget(parent)
 {
     m_pSettingsPageLayout = new QGridLayout();
     this->setLayout(m_pSettingsPageLayout);
+
+    m_pGRBL_instance       = GRBL_instance;
 
     m_pComPortSelectionBox = new QComboBox();
 
@@ -70,16 +71,14 @@ void settingsPage::onComPortSetButtonClicked()
 
     qDebug() << "Connect Port: |" << m_sComPort.c_str() << "|";
 
-    // m_pPnPRunner_instance = std::make_unique<PnPRunner>(m_sComPort.c_str());
+    m_pGRBL_instance = std::make_shared<GRBL>(m_sComPort.c_str());
 
     // if (m_pPnPRunner_instance->getPnPMachine()->getState() == IDLE)
     // {
     //     m_pComPortConnectButton->setStyleSheet("background-color: green;");
-    //     m_pPnPRunner_instance->Start();
     // }
     // else
     // {
     //     m_pComPortConnectButton->setStyleSheet("background-color: red;");
-    //     m_pPnPRunner_instance->RequestStop();
     // }
 }
