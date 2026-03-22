@@ -27,8 +27,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     sideBar* sideBar_instance            = new sideBar(this);
     jobsPage* jobsPage_instance          = new jobsPage(this);
     operatorPage* operatorPage_instance  = new operatorPage(this);
-    settingsPage* settingsPage_instance  = new settingsPage(this);
-    debugPnPTestPage* debugPage_instance = new debugPnPTestPage(m_pGrbl, this);
+    settingsPage* settingsPage_instance  = new settingsPage(m_pGRBL_instance, this);
+    debugPnPTestPage* debugPage_instance = new debugPnPTestPage(m_pGRBL_instance, this);
 
     QTabWidget* tabs                     = new QTabWidget();
     tabs->addTab(jobsPage_instance, "Jobs");

@@ -11,13 +11,15 @@
 
 #include <memory.h>
 
+#include "grbl.hpp"
+
 class settingsPage : public QWidget
 {
         Q_OBJECT
 
     public:
         // std::shared_ptr<PnPRunner> pPnPRunner_instance
-        settingsPage(QWidget* parent = nullptr);
+        settingsPage(std::shared_ptr<GRBL>& GRBL_instance, QWidget* parent = nullptr);
         ~settingsPage();
 
         QList<QString> listPorts();
@@ -31,7 +33,7 @@ class settingsPage : public QWidget
         QList<QString> m_lPorts;
         QPushButton* m_pComPortConnectButton;
 
-        // std::unique_ptr<PnPRunner> m_pPnPRunner_instance;
+        std::shared_ptr<GRBL> m_pGRBL_instance;
         std::atomic<bool> m_bPnPThreadRunning;
 
         std::string m_sComPort;

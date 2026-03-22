@@ -42,7 +42,7 @@ class MainWindow : public QMainWindow
         // Comm and flow control member variables
         QList<QString> listPorts();
         // Comm m_PNPMachineComm;
-        std::shared_ptr<GRBL> m_pGrbl;
+        std::shared_ptr<GRBL> m_pGRBL_instance;
 
     private slots:
         void onTabBarClicked(int index);
