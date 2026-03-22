@@ -34,7 +34,7 @@ void FlowControl::processFiducialDetection(FlowState nextState)
 
         if (!fiducials.empty())
         {
-            gantry_coords_t pos = gantry->getGlobalPosition();
+            grbl_position_t pos = gantry->getGlobalPosition();
             cv::Point3d camPos(pos.x, pos.y, pos.z);
             cv::Vec3d camRPY(0.0, 0.0, 0.0);    // Assuming downward facing
 
