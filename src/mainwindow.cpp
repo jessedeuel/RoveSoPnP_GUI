@@ -19,9 +19,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
     qDebug() << "Initializing MainWindow...";
 
-    // Initialize the shared runner instance before passing it into UI modules
-    // m_pPnPRunner_instance           = std::make_shared<PnPRunner>("/dev/ttyUSB0");    // Default COM port; update as needed
-
     QGridLayout* mainLayout         = new QGridLayout();
 
     customMenuBar* menuBar_instance = new customMenuBar(this);
@@ -31,7 +28,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     jobsPage* jobsPage_instance          = new jobsPage(this);
     operatorPage* operatorPage_instance  = new operatorPage(this);
     settingsPage* settingsPage_instance  = new settingsPage(this);
-    debugPnPTestPage* debugPage_instance = new debugPnPTestPage(this);
+    debugPnPTestPage* debugPage_instance = new debugPnPTestPage(m_pGrbl, this);
 
     QTabWidget* tabs                     = new QTabWidget();
     tabs->addTab(jobsPage_instance, "Jobs");

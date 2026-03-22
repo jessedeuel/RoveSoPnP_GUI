@@ -13,6 +13,8 @@
 #include <QtMultimedia/QMediaCaptureSession>
 #include <QtMultimediaWidgets/QVideoWidget>
 
+#include "grbl.hpp"
+
 // #include "comm.hpp"
 //  #include "pnpRunner.h"
 
@@ -40,7 +42,7 @@ class MainWindow : public QMainWindow
         // Comm and flow control member variables
         QList<QString> listPorts();
         // Comm m_PNPMachineComm;
-        // std::shared_ptr<PnPRunner> m_pPnPRunner_instance;
+        std::shared_ptr<GRBL> m_pGrbl;
 
     private slots:
         void onTabBarClicked(int index);
