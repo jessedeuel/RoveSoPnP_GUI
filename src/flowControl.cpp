@@ -7,11 +7,16 @@ FlowControl::FlowControl(std::shared_ptr<GRBL> grbl_instance, std::shared_ptr<Ba
     head   = std::make_unique<Head>(grbl);
     gantry = std::make_unique<Gantry>(grbl);
     feeder = std::make_unique<Feeder>(grbl);
+    led1   = std::make_unique<LED>(grbl);
+    led2   = std::make_unique<LED>(grbl);
 
     // TODO: Initialize m_gantryCamConfig here with real calibration data
 }
 
-FlowControl::~FlowControl() {}
+FlowControl::~FlowControl()
+{
+    grbl->comm.closeComm();
+}
 
 void FlowControl::setState(FlowState state)
 {
@@ -321,4 +326,28 @@ void FlowControl::tickStateMachine()
 
         case FlowState::MACHINE_IS_STUPID: head->vacuumOff(); break;
     }
+}
+
+FlowState FlowControl::advanceComponent()
+{
+    FlowState next_state       = FlowState::IDLE;
+    components_status_t status = components->incrementCurrentComponent();
+
+    if (status == SAME_CUTTAPE)
+    {
+        // Feed next component
+        // Tell Feeder to step forward
+        next_state = FlowState::PICKUP_SAFE_START_STATE;
+    }
+    else if (status == CHANGE_CUTTAPE)
+        next_state = FlowState::FEEDER_SAFE_START_STATE;
+    else if (status == FINAL_CUTTAPE)
+        next_state = FlowState::IDLE;
+
+    return next_state;
+}
+
+void FlowControl::updateComponents(const char* posFile)
+{
+    components = std::make_unique<Components>(posFile);
 }
