@@ -13,6 +13,7 @@
 #include "../libdeps/RoveSoPnP_FlowControl/include/grbl.hpp"
 #include "../libdeps/RoveSoPnP_FlowControl/include/head.hpp"
 #include "../libdeps/RoveSoPnP_FlowControl/include/tapeLookup.hpp"
+#include "../libdeps/RoveSoPnP_FlowControl/include/LED.hpp"
 
 // --- Vision Library ---
 #include "../libdeps/RoveSoPnP_Vision/src/vision/algorithms/ComponentDetector.hpp"
@@ -20,6 +21,10 @@
 #include "../libdeps/RoveSoPnP_Vision/src/vision/algorithms/PixelTo3D.hpp"
 #include "../libdeps/RoveSoPnP_Vision/src/vision/cameras/BasicCam.h"
 #include <opencv2/opencv.hpp>
+
+// --- Board Placement Files ---
+#define ARM_FlowControl_FILE  "../board/ArmBoard_Hardware-all-pos.csv"
+#define CORE_FlowControl_FILE "../board/CoreBoard-all-pos.csv"
 
 enum class FlowState
 {
@@ -80,6 +85,9 @@ class FlowControl
         std::unique_ptr<Head> head;
         std::unique_ptr<Gantry> gantry;
         std::unique_ptr<Feeder> feeder;
+        std::unique_ptr<LED> led1;
+        std::unique_ptr<LED> led2;
+        std::unique_ptr<Components> components;
 
         // Vision Components
         std::shared_ptr<BasicCam> m_gantryCam;
@@ -136,6 +144,10 @@ class FlowControl
         void setFeederReady(bool ready) { m_userConfirmsFeederReady = ready; }
 
         void resumeMachine() { m_userResumesMachine = true; }
+
+        FlowState advanceComponent();
+
+        void updateComponents(const char* posFile);
 };
 
 #endif    // GUI_FLOWCONTROL_H
