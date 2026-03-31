@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QMessageBox>
+#include <QScrollBar>
 #include <QVBoxLayout>
 
 debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) : QWidget(parent), m_grbl(grbl)
@@ -115,9 +116,26 @@ debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) 
     valuesLayout->addStretch();                  // Pushes the text to the top
     mainLayout->addWidget(valuesGroup, 2, 1);    // Placed in the bottom right
 
+    // ==========================================
+    // 7. Terminal Output Group
+    // ==========================================
+    QGroupBox* terminalGroup    = new QGroupBox("Serial Terminal", this);
+    QVBoxLayout* terminalLayout = new QVBoxLayout(terminalGroup);
+
+    m_pTerminalOutput           = new QPlainTextEdit(this);
+    m_pTerminalOutput->setReadOnly(true);
+    m_pTerminalOutput->setStyleSheet("background-color: #1e1e1e; color: #00ff00; font-family: monospace; font-size: 14px;");
+    terminalLayout->addWidget(m_pTerminalOutput);
+
+    // Spans row 3, columns 0 through 1
+    mainLayout->addWidget(terminalGroup, 3, 0, 1, 2);
+
     // Setup polling timer
     m_pUpdateTimer = new QTimer(this);
     connect(m_pUpdateTimer, &QTimer::timeout, this, &debugPnPTestPage::onUpdateValues);
+
+    // Wire the signal and slot together using a QueuedConnection for thread safety
+    connect(this, &debugPnPTestPage::appendTerminalSignal, this, &debugPnPTestPage::onAppendTerminal, Qt::QueuedConnection);
 
     // Initialize hardware interfaces if GRBL is provided
     if (m_grbl)
@@ -131,6 +149,14 @@ debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) 
         m_pFlowControl = std::make_unique<FlowControl>(m_grbl, nullptr, nullptr);
 
         m_pUpdateTimer->start(200);
+
+        // Attach a Lambda function to the GRBL comm instance to capture TX/RX
+        m_grbl->comm.setLogCallback(
+            [this](const std::string& dir, const std::string& msg)
+            {
+                QString formattedMsg = QString("[%1] %2").arg(QString::fromStdString(dir), QString::fromStdString(msg));
+                emit this->appendTerminalSignal(formattedMsg);
+            });
     }
 
     // ==========================================
@@ -271,4 +297,14 @@ void debugPnPTestPage::onUpdateValues()
         auto pos = m_gantry->getGlobalPosition();
         m_pGantryPosLabel->setText(QString("Gantry X: %1  |  Y: %2").arg(pos.x, 0, 'f', 2).arg(pos.y, 0, 'f', 2));
     }
+}
+
+void debugPnPTestPage::onAppendTerminal(const QString& text)
+{
+    // Append the text to the UI
+    m_pTerminalOutput->appendPlainText(text);
+
+    // Auto-scroll to the bottom
+    QScrollBar* bar = m_pTerminalOutput->verticalScrollBar();
+    bar->setValue(bar->maximum());
 }
