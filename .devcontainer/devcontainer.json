@@ -23,6 +23,9 @@
         // X11 socket for XWayland
         "-v",
         "/tmp/.X11-unix:/tmp/.X11-unix",
+        // map the physical devices.
+        "--device=/dev/ttyUSB0:/dev/ttyUSB0",
+        "--device=/dev/ttyACM0:/dev/ttyACM0",
         // Link /dev so v4l /dev is accessible.
         "-v",
         "/dev:/dev",
@@ -53,8 +56,9 @@
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created.
+    "initializeCommand": "python3 .devcontainer/host_setup.py",
     "postStartCommand": "git config --global --add safe.directory '*'",
-    "postCreateCommand": "echo 'Welcome to the RoveSoSeniorDesign, RoveSoPNP Development Environment!'",
+    "postCreateCommand": "bash .devcontainer/container_setup.sh",
     // Configure tool-specific properties.
     "customizations": {
         // Configure properties specific to VS Code.
