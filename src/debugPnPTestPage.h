@@ -6,6 +6,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QTimer>
@@ -28,6 +29,10 @@ class debugPnPTestPage : public QWidget
         explicit debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent = nullptr);
         ~debugPnPTestPage();
 
+    signals:
+        // Thread-safe signal to pass C++ strings to the Qt Event Loop
+        void appendTerminalSignal(const QString& text);
+
     private slots:
         void onMoveXYClicked();
         void onMoveZClicked();
@@ -45,6 +50,9 @@ class debugPnPTestPage : public QWidget
 
         // Slot for polling live values
         void onUpdateValues();
+
+        // Slot that updates the UI safely
+        void onAppendTerminal(const QString& text);
 
     private:
         bool checkConnection();
@@ -78,6 +86,9 @@ class debugPnPTestPage : public QWidget
         // Live Values UI Elements
         QLabel* m_pGantryPosLabel;
         QTimer* m_pUpdateTimer;
+
+        // Terminal UI Element
+        QPlainTextEdit* m_pTerminalOutput;
 
         // --- Hardware Control Instances ---
         std::shared_ptr<GRBL> m_grbl;
