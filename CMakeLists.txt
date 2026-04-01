@@ -27,7 +27,12 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 # Find OpenCV
 find_package(OpenCV REQUIRED)
 
-find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "/opt/Qt/6.9.3/gcc_64")
+# find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "/opt/Qt/6.9.3/gcc_arm64")
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+    find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "/opt/Qt/6.9.3/gcc_arm64")
+else()
+    find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "/opt/Qt/6.9.3/gcc_64")
+endif()
 
 ####################################################################################################################
 ##                                                Build Executable                           
