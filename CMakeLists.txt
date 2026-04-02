@@ -29,9 +29,9 @@ find_package(OpenCV REQUIRED)
 
 # find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "/opt/Qt/6.9.3/gcc_arm64")
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
-    find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "/opt/Qt/6.9.3/gcc_arm64")
+    find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets SerialPort LinguistTools HINTS "/opt/Qt/6.9.3/gcc_arm64")
 else()
-    find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets LinguistTools HINTS "/opt/Qt/6.9.3/gcc_64")
+    find_package(Qt6 6.9 REQUIRED COMPONENTS Core Widgets SerialPort LinguistTools HINTS "/opt/Qt/6.9.3/gcc_64")
 endif()
 
 ####################################################################################################################
@@ -69,6 +69,7 @@ target_link_libraries(RoveSoPnP_GUI
     PRIVATE
         Qt::Core
         Qt::Widgets
+        Qt::SerialPort
         Threads::Threads
         RoveFlowControl
         RoveVision

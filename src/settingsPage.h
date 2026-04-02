@@ -6,6 +6,7 @@
 #include <QFontMetrics>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QSerialPortInfo>
 #include <QTextEdit>
 #include <QWidget>
 
@@ -18,19 +19,18 @@ class settingsPage : public QWidget
         Q_OBJECT
 
     public:
-        // std::shared_ptr<PnPRunner> pPnPRunner_instance
         settingsPage(std::shared_ptr<GRBL> GRBL_instance, QWidget* parent = nullptr);
         ~settingsPage();
 
         QList<QString> listPorts();
-
-        // PnP* getPnPMachine();
         int connectPnPMachine(QString comPort, QString csvFile);
 
     private:
         QGridLayout* m_pSettingsPageLayout;
         QComboBox* m_pComPortSelectionBox;
         QList<QString> m_lPorts;
+
+        QPushButton* m_pRefreshPortsButton;
         QPushButton* m_pComPortConnectButton;
 
         std::shared_ptr<GRBL> m_pGRBL_instance;
@@ -38,9 +38,7 @@ class settingsPage : public QWidget
 
         std::string m_sComPort;
 
-        // TODO: Add thread for PnP ticking
-        // void PnPThreadHandler();
-
     private slots:
         void onComPortSetButtonClicked();
+        void onRefreshPortsButtonClicked();
 };
