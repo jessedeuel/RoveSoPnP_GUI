@@ -151,7 +151,7 @@ debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) 
         m_pUpdateTimer->start(200);
 
         // Attach a Lambda function to the GRBL comm instance to capture TX/RX
-        m_grbl->comm.setLogCallback(
+        m_grbl->setLogCallback(
             [this](const std::string& dir, const std::string& msg)
             {
                 QString formattedMsg = QString("[%1] %2").arg(QString::fromStdString(dir), QString::fromStdString(msg));

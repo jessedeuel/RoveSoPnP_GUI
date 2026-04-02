@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     customMenuBar* menuBar_instance = new customMenuBar(this);
     this->setMenuBar(menuBar_instance);
 
+    m_pGRBL_instance                     = std::make_shared<GRBL>();
+
     sideBar* sideBar_instance            = new sideBar(this);
     jobsPage* jobsPage_instance          = new jobsPage(this);
     operatorPage* operatorPage_instance  = new operatorPage(this);

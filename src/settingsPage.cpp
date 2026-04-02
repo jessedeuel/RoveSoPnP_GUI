@@ -2,7 +2,7 @@
 #include <QDebug>
 #include <array>
 
-settingsPage::settingsPage(std::shared_ptr<GRBL>& GRBL_instance, QWidget* parent) : QWidget(parent)
+settingsPage::settingsPage(std::shared_ptr<GRBL> GRBL_instance, QWidget* parent) : QWidget(parent)
 {
     m_pSettingsPageLayout = new QGridLayout();
     this->setLayout(m_pSettingsPageLayout);
@@ -68,7 +68,7 @@ void settingsPage::onComPortSetButtonClicked()
 
     qDebug() << "Connect Port: |" << m_sComPort.c_str() << "|";
 
-    m_pGRBL_instance = std::make_shared<GRBL>(m_sComPort.c_str());
+    m_pGRBL_instance->connect(m_sComPort.c_str());
 
     // if (m_pPnPRunner_instance->getPnPMachine()->getState() == IDLE)
     // {

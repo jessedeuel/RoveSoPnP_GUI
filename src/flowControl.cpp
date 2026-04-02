@@ -15,7 +15,7 @@ FlowControl::FlowControl(std::shared_ptr<GRBL> grbl_instance, std::shared_ptr<Ba
 
 FlowControl::~FlowControl()
 {
-    grbl->comm.disconnect();
+    grbl->disconnect();
 }
 
 void FlowControl::setState(FlowState state)

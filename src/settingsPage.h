@@ -19,7 +19,7 @@ class settingsPage : public QWidget
 
     public:
         // std::shared_ptr<PnPRunner> pPnPRunner_instance
-        settingsPage(std::shared_ptr<GRBL>& GRBL_instance, QWidget* parent = nullptr);
+        settingsPage(std::shared_ptr<GRBL> GRBL_instance, QWidget* parent = nullptr);
         ~settingsPage();
 
         QList<QString> listPorts();
