@@ -148,7 +148,7 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
     chmod +x qt-online-installer-linux-arm64-online.run && \
     ./qt-online-installer-linux-arm64-online.run --root ${QT_INSTALL_DIR} --accept-licenses --accept-obligations \
     --confirm-command --email ${QT_EMAIL} --pw ${QT_PASSWD} --accept-messages --essential \
-    install qt6.9.3-essentials qt.qt6.693.addons.qtmultimedia qt.qt6.693.addons.qtserialport; \
+    install qt6.9.3-essentials qt.qt6.693.addons.qtmultimedia qt.qt6.693.qtserialport; \
     else \
     echo "Unsupported architecture"; \
     fi
