@@ -24,7 +24,11 @@ debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) 
     m_pZSpin     = new QDoubleSpinBox(this);
     m_pZSpin->setRange(-2000, 2000);
     m_pMoveZBtn      = new QPushButton("Set Head Height (Z)", this);
+
     m_pHomeGantryBtn = new QPushButton("Home Gantry", this);
+    m_pUnlockBtn     = new QPushButton("Unlock ($X)", this);
+    m_pPauseBtn      = new QPushButton("Pause/Hold (!)", this);
+    m_pResumeBtn     = new QPushButton("Resume (~)", this);
 
     gantryLayout->addWidget(new QLabel("X:"), 0, 0);
     gantryLayout->addWidget(m_pXSpin, 0, 1);
@@ -36,7 +40,12 @@ debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) 
     gantryLayout->addWidget(m_pZSpin, 1, 1, 1, 3);
     gantryLayout->addWidget(m_pMoveZBtn, 1, 4);
 
-    gantryLayout->addWidget(m_pHomeGantryBtn, 2, 0, 1, 5);
+    // 2x2 Grid for System Commands
+    gantryLayout->addWidget(m_pHomeGantryBtn, 2, 0, 1, 2);
+    gantryLayout->addWidget(m_pUnlockBtn, 2, 2, 1, 3);
+    gantryLayout->addWidget(m_pPauseBtn, 3, 0, 1, 2);
+    gantryLayout->addWidget(m_pResumeBtn, 3, 2, 1, 3);
+
     mainLayout->addWidget(gantryGroup, 0, 0);
 
     // ==========================================
@@ -101,23 +110,12 @@ debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) 
     m_pTickStateBtn          = new QPushButton("Tick State Machine", this);
     stateLayout->addWidget(m_pAdvanceCompBtn);
     stateLayout->addWidget(m_pTickStateBtn);
-    mainLayout->addWidget(stateGroup, 2, 0);    // Placed in the bottom left
+
+    // Allow the state group to span across two columns to fill the visual gap
+    mainLayout->addWidget(stateGroup, 2, 0, 1, 2);
 
     // ==========================================
-    // 6. Live Values Group
-    // ==========================================
-    QGroupBox* valuesGroup    = new QGroupBox("Live Hardware Values", this);
-    QVBoxLayout* valuesLayout = new QVBoxLayout(valuesGroup);
-
-    m_pGantryPosLabel         = new QLabel("Gantry: Disconnected", this);
-
-    // Add future labels (head, feeder) here when ready
-    valuesLayout->addWidget(m_pGantryPosLabel);
-    valuesLayout->addStretch();                  // Pushes the text to the top
-    mainLayout->addWidget(valuesGroup, 2, 1);    // Placed in the bottom right
-
-    // ==========================================
-    // 7. Terminal Output Group
+    // 6. Terminal Output Group
     // ==========================================
     QGroupBox* terminalGroup    = new QGroupBox("Serial Terminal", this);
     QVBoxLayout* terminalLayout = new QVBoxLayout(terminalGroup);
@@ -126,18 +124,11 @@ debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) 
     m_pTerminalOutput->setReadOnly(true);
     m_pTerminalOutput->setStyleSheet("background-color: #1e1e1e; color: #00ff00; font-family: monospace; font-size: 14px;");
     terminalLayout->addWidget(m_pTerminalOutput);
-
-    // Spans row 3, columns 0 through 1
     mainLayout->addWidget(terminalGroup, 3, 0, 1, 2);
 
-    // Setup polling timer
-    m_pUpdateTimer = new QTimer(this);
-    connect(m_pUpdateTimer, &QTimer::timeout, this, &debugPnPTestPage::onUpdateValues);
-
-    // Wire the signal and slot together using a QueuedConnection for thread safety
+    // Terminal signal routing
     connect(this, &debugPnPTestPage::appendTerminalSignal, this, &debugPnPTestPage::onAppendTerminal, Qt::QueuedConnection);
 
-    // Initialize hardware interfaces if GRBL is provided
     if (m_grbl)
     {
         m_gantry       = std::make_unique<Gantry>(m_grbl);
@@ -145,12 +136,8 @@ debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) 
         m_feeder       = std::make_unique<Feeder>(m_grbl);
         m_led1         = std::make_unique<LED>(m_grbl);
         m_led2         = std::make_unique<LED>(m_grbl);
-
         m_pFlowControl = std::make_unique<FlowControl>(m_grbl, nullptr, nullptr);
 
-        m_pUpdateTimer->start(200);
-
-        // Attach a Lambda function to the GRBL comm instance to capture TX/RX
         m_grbl->setLogCallback(
             [this](const std::string& dir, const std::string& msg)
             {
@@ -159,12 +146,13 @@ debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) 
             });
     }
 
-    // ==========================================
-    // Signal/Slot Connections
-    // ==========================================
+    // Connect UI Signals
     connect(m_pMoveXYBtn, &QPushButton::clicked, this, &debugPnPTestPage::onMoveXYClicked);
     connect(m_pMoveZBtn, &QPushButton::clicked, this, &debugPnPTestPage::onMoveZClicked);
     connect(m_pHomeGantryBtn, &QPushButton::clicked, this, &debugPnPTestPage::onHomeGantryClicked);
+    connect(m_pUnlockBtn, &QPushButton::clicked, this, &debugPnPTestPage::onUnlockClicked);
+    connect(m_pPauseBtn, &QPushButton::clicked, this, &debugPnPTestPage::onPauseClicked);
+    connect(m_pResumeBtn, &QPushButton::clicked, this, &debugPnPTestPage::onResumeClicked);
     connect(m_pRotateHeadBtn, &QPushButton::clicked, this, &debugPnPTestPage::onRotateHeadClicked);
     connect(m_pVacuumOnBtn, &QPushButton::clicked, this, &debugPnPTestPage::onVacuumOnClicked);
     connect(m_pVacuumOffBtn, &QPushButton::clicked, this, &debugPnPTestPage::onVacuumOffClicked);
@@ -189,83 +177,122 @@ bool debugPnPTestPage::checkConnection()
     return true;
 }
 
-void debugPnPTestPage::onMoveXYClicked()
+void debugPnPTestPage::executeHardwareTask(const std::function<void()>& task)
 {
     if (!checkConnection())
         return;
-    m_gantry->setGlobalPosition(m_pXSpin->value(), m_pYSpin->value());
+
+    this->setEnabled(false);
+    task();
+    this->setEnabled(true);
+}
+
+void debugPnPTestPage::onMoveXYClicked()
+{
+    double targetX = m_pXSpin->value();
+    double targetY = m_pYSpin->value();
+    executeHardwareTask([this, targetX, targetY]() { m_gantry->setGlobalPosition(targetX, targetY); });
 }
 
 void debugPnPTestPage::onMoveZClicked()
 {
-    if (!checkConnection())
-        return;
-    m_gantry->setHeadHeight(m_pZSpin->value());
+    double targetZ = m_pZSpin->value();
+    executeHardwareTask([this, targetZ]() { m_gantry->setHeadHeight(targetZ); });
 }
 
 void debugPnPTestPage::onHomeGantryClicked()
 {
-    if (!checkConnection())
-        return;
-    m_gantry->home();
+    executeHardwareTask([this]() { m_gantry->home(); });
+}
+
+void debugPnPTestPage::onUnlockClicked()
+{
+    executeHardwareTask(
+        [this]()
+        {
+            if (m_grbl)
+            {
+                m_grbl->sendCommand("$X");
+            }
+        });
+}
+
+void debugPnPTestPage::onPauseClicked()
+{
+    executeHardwareTask(
+        [this]()
+        {
+            if (m_grbl)
+            {
+                m_grbl->feedHold();
+            }
+        });
+}
+
+void debugPnPTestPage::onResumeClicked()
+{
+    executeHardwareTask(
+        [this]()
+        {
+            if (m_grbl)
+            {
+                m_grbl->cycleStart();
+            }
+        });
 }
 
 void debugPnPTestPage::onRotateHeadClicked()
 {
-    if (!checkConnection())
-        return;
-    m_head->increment(m_pHeadAngleSpin->value());
+    double angle = m_pHeadAngleSpin->value();
+    executeHardwareTask([this, angle]() { m_head->increment(angle); });
 }
 
 void debugPnPTestPage::onVacuumOnClicked()
 {
-    if (!checkConnection())
-        return;
-    m_head->vacuumOn();
+    executeHardwareTask([this]() { m_head->vacuumOn(); });
 }
 
 void debugPnPTestPage::onVacuumOffClicked()
 {
-    if (!checkConnection())
-        return;
-    m_head->vacuumOff();
+    executeHardwareTask([this]() { m_head->vacuumOff(); });
 }
 
 void debugPnPTestPage::onFeedClicked()
 {
-    if (!checkConnection())
-        return;
-    m_feeder->increment(m_pFeederLengthSpin->value());
+    double length = m_pFeederLengthSpin->value();
+    executeHardwareTask([this, length]() { m_feeder->increment(length); });
 }
 
 void debugPnPTestPage::onLed1OnClicked()
 {
-    if (!checkConnection())
-        return;
-    m_led1->setColor(static_cast<LED_COLOR>(m_pLedColorCombo->currentIndex()));
-    m_led1->setOn();
+    auto color = static_cast<LED_COLOR>(m_pLedColorCombo->currentIndex());
+    executeHardwareTask(
+        [this, color]()
+        {
+            m_led1->setColor(color);
+            m_led1->setOn();
+        });
 }
 
 void debugPnPTestPage::onLed1OffClicked()
 {
-    if (!checkConnection())
-        return;
-    m_led1->setOff();
+    executeHardwareTask([this]() { m_led1->setOff(); });
 }
 
 void debugPnPTestPage::onLed2OnClicked()
 {
-    if (!checkConnection())
-        return;
-    m_led2->setColor(static_cast<LED_COLOR>(m_pLedColorCombo->currentIndex()));
-    m_led2->setOn();
+    auto color = static_cast<LED_COLOR>(m_pLedColorCombo->currentIndex());
+    executeHardwareTask(
+        [this, color]()
+        {
+            m_led2->setColor(color);
+            m_led2->setOn();
+        });
 }
 
 void debugPnPTestPage::onLed2OffClicked()
 {
-    if (!checkConnection())
-        return;
-    m_led2->setOff();
+    executeHardwareTask([this]() { m_led2->setOff(); });
 }
 
 void debugPnPTestPage::onAdvanceCompClicked()
@@ -273,8 +300,7 @@ void debugPnPTestPage::onAdvanceCompClicked()
     if (!checkConnection() || !m_pFlowControl)
         return;
 
-    // Set the state directly using the new FlowState enum
-    m_pFlowControl->setState(FlowState::GET_NEXT_COMPONENT);
+    executeHardwareTask([this]() { m_pFlowControl->setState(FlowState::GET_NEXT_COMPONENT); });
     qDebug() << "Advanced Component. State machine set to GET_NEXT_COMPONENT";
 }
 
@@ -283,28 +309,13 @@ void debugPnPTestPage::onTickStateClicked()
     if (!checkConnection() || !m_pFlowControl)
         return;
 
-    m_pFlowControl->tickStateMachine();
+    executeHardwareTask([this]() { m_pFlowControl->tickStateMachine(); });
     qDebug() << "Tick completed. Current State:" << static_cast<int>(m_pFlowControl->getState());
-}
-
-void debugPnPTestPage::onUpdateValues()
-{
-    // Polled periodically by m_pUpdateTimer
-    if (m_gantry)
-    {
-        // Assuming getGlobalPosition returns a struct with .x and .y
-        // Change pos.x/pos.y to pos.first/pos.second if returning std::pair
-        auto pos = m_gantry->getGlobalPosition();
-        m_pGantryPosLabel->setText(QString("Gantry X: %1  |  Y: %2").arg(pos.x, 0, 'f', 2).arg(pos.y, 0, 'f', 2));
-    }
 }
 
 void debugPnPTestPage::onAppendTerminal(const QString& text)
 {
-    // Append the text to the UI
     m_pTerminalOutput->appendPlainText(text);
-
-    // Auto-scroll to the bottom
     QScrollBar* bar = m_pTerminalOutput->verticalScrollBar();
     bar->setValue(bar->maximum());
 }

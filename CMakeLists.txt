@@ -3,6 +3,9 @@ project(RoveSoPnP_GUI LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Enable Qt's Meta-Object Compiler
+set(CMAKE_AUTOMOC ON)
+
 if(DEFINED ENV{QT})
     message(STATUS "QT is set to $ENV{QT}")
 else()

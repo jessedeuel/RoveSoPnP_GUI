@@ -9,14 +9,14 @@
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSpinBox>
-#include <QTimer>
 #include <QWidget>
+#include <functional>
 #include <memory>
 
 // Hardware and Flow Control Includes
 #include "LED.hpp"
 #include "feeder.hpp"
-#include "flowControl.h"    // Ensure this matches the exact casing of your header file
+#include "flowControl.h"
 #include "gantry.hpp"
 #include "grbl.hpp"
 #include "head.hpp"
@@ -30,13 +30,15 @@ class debugPnPTestPage : public QWidget
         ~debugPnPTestPage();
 
     signals:
-        // Thread-safe signal to pass C++ strings to the Qt Event Loop
         void appendTerminalSignal(const QString& text);
 
     private slots:
         void onMoveXYClicked();
         void onMoveZClicked();
         void onHomeGantryClicked();
+        void onUnlockClicked();
+        void onPauseClicked();     // NEW: Pause GRBL
+        void onResumeClicked();    // NEW: Resume GRBL
         void onRotateHeadClicked();
         void onVacuumOnClicked();
         void onVacuumOffClicked();
@@ -48,14 +50,12 @@ class debugPnPTestPage : public QWidget
         void onAdvanceCompClicked();
         void onTickStateClicked();
 
-        // Slot for polling live values
-        void onUpdateValues();
-
-        // Slot that updates the UI safely
         void onAppendTerminal(const QString& text);
 
     private:
         bool checkConnection();
+
+        void executeHardwareTask(const std::function<void()>& task);
 
         // --- UI Elements ---
         QDoubleSpinBox* m_pXSpin;
@@ -64,7 +64,11 @@ class debugPnPTestPage : public QWidget
 
         QDoubleSpinBox* m_pZSpin;
         QPushButton* m_pMoveZBtn;
+
         QPushButton* m_pHomeGantryBtn;
+        QPushButton* m_pUnlockBtn;
+        QPushButton* m_pPauseBtn;     // NEW: Pause Button
+        QPushButton* m_pResumeBtn;    // NEW: Resume Button
 
         QSpinBox* m_pHeadAngleSpin;
         QPushButton* m_pRotateHeadBtn;
@@ -83,11 +87,6 @@ class debugPnPTestPage : public QWidget
         QPushButton* m_pAdvanceCompBtn;
         QPushButton* m_pTickStateBtn;
 
-        // Live Values UI Elements
-        QLabel* m_pGantryPosLabel;
-        QTimer* m_pUpdateTimer;
-
-        // Terminal UI Element
         QPlainTextEdit* m_pTerminalOutput;
 
         // --- Hardware Control Instances ---
