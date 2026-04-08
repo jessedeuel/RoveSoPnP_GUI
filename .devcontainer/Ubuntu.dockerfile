@@ -137,24 +137,11 @@ RUN echo "Qt email: ${QT_EMAIL}"
 RUN echo "Qt passwd: ${QT_PASSWD}"
 RUN echo "Qt install dir: ${QT_INSTALL_DIR}"
 
-RUN if [ "$TARGETARCH" = "amd64" ]; then \
-    wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run && \
+RUN wget https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run && \
     chmod +x qt-online-installer-linux-x64-online.run && \
     ./qt-online-installer-linux-x64-online.run --root ${QT_INSTALL_DIR} --accept-licenses --accept-obligations \
     --confirm-command --email ${QT_EMAIL} --pw ${QT_PASSWD} --accept-messages --essential \
-    install qt6.9.3-essentials qt.qt6.693.addons.qtmultimedia qt.qt6.693.qtserialport; \
-    elif [ "$TARGETARCH" = "arm64" ]; then \
-    ARG QT_VERSION=6.9.3
-    RUN git clone https://code.qt.io/qt/qtserialport.git /tmp/qtserialport \
-        && cd /tmp/qtserialport \
-        && git checkout v${QT_VERSION} \
-        && /opt/Qt/${QT_VERSION}/gcc_arm64/bin/qt-cmake . \
-        && cmake --build . -j$(nproc) \
-        && cmake --install . \
-        && rm -rf /tmp/qtserialport
-    else \
-    echo "Unsupported architecture"; \
-    fi
+    install qt6.9.3-essentials qt.qt6.693.addons.qtmultimedia qt.qt6.693.addons.qtserialport;
 
 RUN cd ${QT_INSTALL_DIR} && \
     ./MaintenanceTool clear-cache && \
