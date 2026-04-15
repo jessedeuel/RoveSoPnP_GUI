@@ -94,7 +94,7 @@ class FlowControl
         std::shared_ptr<BasicCam> m_upwardCam;
         cv::Mat m_cvCurrentFrame;
         CameraConfig m_gantryCamConfig;    // Setup with your real K/D matrices
-        std::vector<cv::Point3d> m_fiducialWorldCoords;
+        std::vector<board_coords_t> m_fiducialWorldCoords;
 
         // State management
         FlowState m_currentState  = FlowState::IDLE;

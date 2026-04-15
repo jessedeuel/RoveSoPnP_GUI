@@ -43,7 +43,7 @@ void FlowControl::processFiducialDetection(FlowState nextState)
 
             if (offset.has_value())
             {
-                m_fiducialWorldCoords.push_back(offset.value());
+                m_fiducialWorldCoords.push_back({offset->x, offset->y, 0.0});
             }
         }
     }
@@ -146,7 +146,8 @@ void FlowControl::tickStateMachine()
         case FlowState::DETECT_FIDUCIAL_4: processFiducialDetection(FlowState::CALCULATE_BOARD_TRANSFORM); break;
 
         case FlowState::CALCULATE_BOARD_TRANSFORM:
-            // TODO: Pass m_fiducialWorldCoords to the Board class
+            components->calculateBoardOffset(m_fiducialWorldCoords);
+            components->printCoords({0,0,0});
             setState(FlowState::FEEDER_SAFE_START_STATE);
             break;
 
