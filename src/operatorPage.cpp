@@ -1,308 +1,321 @@
 #include "operatorPage.h"
-#include <QDebug>
-#include <QImage>
-#include <QMessageBox>
-#include <QPixmap>
-#include <QTimer>    // Added QTimer include
+#include <QApplication>
+#include <QFont>
+#include <QFrame>
+#include <QStyle>
 
-#include "vision/algorithms/ComponentDetector.hpp"
-#include "vision/algorithms/FicucialDetector.hpp"
-#include "vision/algorithms/VisualHoming.hpp"
-
-// std::shared_ptr<PnPRunner> pnpRunner
-// m_pPnPRunner_instance(pnpRunner)
-operatorPage::operatorPage(QWidget* parent) : QWidget(parent), m_eVisionMode(VisionMode::None)
+OperatorPage::OperatorPage(QWidget* parent) : QWidget(parent)
 {
-    m_pOperatorPageLayout = new QGridLayout(this);
+    setupUI();
+    setMachineStateToSetup();    // Default state
+}
 
-    // ==========================================
-    // 1. MACHINE STATUS PANEL (Top Left)
-    // ==========================================
-    m_pStatusGroup            = new QGroupBox("Machine Status", this);
-    QVBoxLayout* statusLayout = new QVBoxLayout(m_pStatusGroup);
-    m_pStateLabel             = new QLabel("State: DISCONNECTED", this);
-    m_pStateLabel->setStyleSheet("font-weight: bold; font-size: 16px; color: red;");
-    m_pPositionLabel = new QLabel("X: 0.00  Y: 0.00  Z: 0.00  A: 0.00", this);
+OperatorPage::~OperatorPage() {}
 
-    statusLayout->addWidget(m_pStateLabel);
-    statusLayout->addWidget(m_pPositionLabel);
-    m_pOperatorPageLayout->addWidget(m_pStatusGroup, 0, 0);
+void OperatorPage::setupUI()
+{
+    QHBoxLayout* mainLayout = new QHBoxLayout(this);
+    mainLayout->setContentsMargins(10, 10, 10, 10);
+    mainLayout->setSpacing(15);
 
-    // ==========================================
-    // 2. CONTROL PANEL (Bottom Left)
-    // ==========================================
-    m_pControlGroup            = new QGroupBox("Machine Controls", this);
-    QVBoxLayout* controlLayout = new QVBoxLayout(m_pControlGroup);
+    createVisionPanel(mainLayout);
+    createControlPanel(mainLayout);
+}
 
-    m_pHomeBtn                 = new QPushButton("Home Machine", this);
-    m_pCalibrateVisionBtn      = new QPushButton("Calibrate PCB Vision", this);
-    m_pStartJobBtn             = new QPushButton("Start Job", this);
-    m_pPauseBtn                = new QPushButton("Pause", this);
-    m_pAbortBtn                = new QPushButton("ABORT / E-STOP", this);
-    m_pAbortBtn->setStyleSheet("background-color: red; color: white; font-weight: bold;");
+void OperatorPage::createVisionPanel(QHBoxLayout* mainLayout)
+{
+    QVBoxLayout* visionLayout = new QVBoxLayout();
 
-    controlLayout->addWidget(m_pHomeBtn);
-    controlLayout->addWidget(m_pCalibrateVisionBtn);
-    controlLayout->addWidget(m_pStartJobBtn);
-    controlLayout->addWidget(m_pPauseBtn);
-    controlLayout->addWidget(m_pAbortBtn);
-    m_pOperatorPageLayout->addWidget(m_pControlGroup, 1, 0);
+    // Header for the camera
+    cameraStatusLabel = new QLabel("Active View: Waiting for camera...", this);
+    QFont headerFont  = cameraStatusLabel->font();
+    headerFont.setPointSize(14);
+    headerFont.setBold(true);
+    cameraStatusLabel->setFont(headerFont);
+    cameraStatusLabel->setStyleSheet("color: #2c3e50;");
 
-    // Connect control buttons to PnPRunner state machine
-    connect(m_pHomeBtn, &QPushButton::clicked, this, &operatorPage::onHomeClicked);
-    connect(m_pCalibrateVisionBtn, &QPushButton::clicked, this, &operatorPage::onCalibrateClicked);
-    connect(m_pStartJobBtn, &QPushButton::clicked, this, &operatorPage::onStartJobClicked);
-    connect(m_pPauseBtn, &QPushButton::clicked, this, &operatorPage::onPauseClicked);
-    connect(m_pAbortBtn, &QPushButton::clicked, this, &operatorPage::onAbortClicked);
+    // The actual video feed display
+    cameraFeedLabel = new QLabel("NO SIGNAL", this);
+    cameraFeedLabel->setAlignment(Qt::AlignCenter);
+    cameraFeedLabel->setStyleSheet(
+        "QLabel { background-color: #000000; color: #ff0000; font-weight: bold; font-size: 24px; border: 2px solid #7f8c8d; border-radius: 5px; }");
+    cameraFeedLabel->setMinimumSize(640, 480);
+    cameraFeedLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    // ==========================================
-    // 3. VISION PANEL (Right Side)
-    // ==========================================
-    m_pVisionGroup               = new QGroupBox("Live Vision Feed", this);
-    QVBoxLayout* visionLayout    = new QVBoxLayout(m_pVisionGroup);
+    visionLayout->addWidget(cameraStatusLabel);
+    visionLayout->addWidget(cameraFeedLabel);
 
-    QHBoxLayout* visionBtnLayout = new QHBoxLayout();
-    m_pModeNoneBtn               = new QPushButton("Raw", this);
-    m_pModeFiducialBtn           = new QPushButton("Fiducial", this);
-    m_pModeComponentBtn          = new QPushButton("Component", this);
-    m_pModeHomingBtn             = new QPushButton("Homing", this);
-    visionBtnLayout->addWidget(m_pModeNoneBtn);
-    visionBtnLayout->addWidget(m_pModeFiducialBtn);
-    visionBtnLayout->addWidget(m_pModeComponentBtn);
-    visionBtnLayout->addWidget(m_pModeHomingBtn);
+    // Assign 60% of the screen width to the vision layout
+    mainLayout->addLayout(visionLayout, 6);
+}
 
-    m_pCameraDisplayLabel = new QLabel("Loading Camera...", this);
-    m_pCameraDisplayLabel->setMinimumSize(640, 480);
-    m_pCameraDisplayLabel->setAlignment(Qt::AlignCenter);
-    m_pCameraDisplayLabel->setStyleSheet("background-color: #222; color: white;");
+void OperatorPage::createControlPanel(QHBoxLayout* mainLayout)
+{
+    QVBoxLayout* controlLayout = new QVBoxLayout();
 
-    visionLayout->addLayout(visionBtnLayout);
-    visionLayout->addWidget(m_pCameraDisplayLabel);
-    m_pOperatorPageLayout->addWidget(m_pVisionGroup, 0, 1, 2, 1);    // Span 2 rows
+    modeStackedWidget          = new QStackedWidget(this);
+    modeStackedWidget->addWidget(createSetupPage());       // Index 0
+    modeStackedWidget->addWidget(createRunPage());         // Index 1
+    modeStackedWidget->addWidget(createTapeSwapPage());    // Index 2
 
-    // --- GCode Entry Setup ---
-    m_pGCodeEntryTextBox = new QTextEdit("Enter GCode", this);
-    m_pGCodeEntryTextBox->setMaximumHeight(50);
-    m_pGCodeSendButton = new QPushButton("Send GCode", this);
-    m_pOperatorPageLayout->addWidget(m_pGCodeEntryTextBox, 3, 0);
-    m_pOperatorPageLayout->addWidget(m_pGCodeSendButton, 3, 1);
-    // Connect GCode Send Button
-    connect(m_pGCodeSendButton, &QPushButton::clicked, this, &operatorPage::onGCodeSendButtonClicked);
+    jogGroupBox = createJogPanel();
 
-    // Connect Vision Buttons
-    connect(m_pModeNoneBtn, &QPushButton::clicked, this, &operatorPage::setVisionNone);
-    connect(m_pModeFiducialBtn, &QPushButton::clicked, this, &operatorPage::setVisionFiducial);
-    connect(m_pModeComponentBtn, &QPushButton::clicked, this, &operatorPage::setVisionComponent);
-    connect(m_pModeHomingBtn, &QPushButton::clicked, this, &operatorPage::setVisionHoming);
+    controlLayout->addWidget(modeStackedWidget, 1);
+    controlLayout->addWidget(jogGroupBox, 0);    // Fixed size at bottom
 
-    // ==========================================
-    // Initialization & Timers
-    // ==========================================
-    try
+    // Assign 40% of the screen width to the control layout
+    mainLayout->addLayout(controlLayout, 4);
+}
+
+QWidget* OperatorPage::createSetupPage()
+{
+    QWidget* page       = new QWidget();
+    QVBoxLayout* layout = new QVBoxLayout(page);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    QGroupBox* setupGroup    = new QGroupBox("Job Setup & Alignment");
+    QVBoxLayout* groupLayout = new QVBoxLayout(setupGroup);
+
+    QLabel* instructionLabel = new QLabel("1. Jog the gantry camera to Fiducial 1 and lock it.\n2. Jog to Fiducial 2 and lock it.\n3. Start the job.");
+    instructionLabel->setWordWrap(true);
+
+    QPushButton* btnSetFiducial1 = new QPushButton("Lock Fiducial 1");
+    QPushButton* btnSetFiducial2 = new QPushButton("Lock Fiducial 2");
+    QPushButton* btnStartJob     = new QPushButton("START JOB");
+
+    btnStartJob->setStyleSheet("QPushButton { background-color: #27ae60; color: white; font-weight: bold; padding: 15px; border-radius: 5px; } QPushButton:hover { "
+                               "background-color: #2ecc71; }");
+
+    connect(btnSetFiducial1, &QPushButton::clicked, this, [this]() { emit requestSetFiducial(1); });
+    connect(btnSetFiducial2, &QPushButton::clicked, this, [this]() { emit requestSetFiducial(2); });
+    connect(btnStartJob, &QPushButton::clicked, this, &OperatorPage::onStartClicked);
+
+    groupLayout->addWidget(instructionLabel);
+    groupLayout->addSpacing(10);
+    groupLayout->addWidget(btnSetFiducial1);
+    groupLayout->addWidget(btnSetFiducial2);
+    groupLayout->addStretch();
+    groupLayout->addWidget(btnStartJob);
+
+    layout->addWidget(setupGroup);
+    return page;
+}
+
+QWidget* OperatorPage::createRunPage()
+{
+    QWidget* page       = new QWidget();
+    QVBoxLayout* layout = new QVBoxLayout(page);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    QGroupBox* runGroup      = new QGroupBox("Running Job Status");
+    QVBoxLayout* groupLayout = new QVBoxLayout(runGroup);
+
+    currentTaskLabel         = new QLabel("Status: Idle");
+    QFont font               = currentTaskLabel->font();
+    font.setPointSize(12);
+    font.setBold(true);
+    currentTaskLabel->setFont(font);
+    currentTaskLabel->setWordWrap(true);
+
+    jobProgressBar = new QProgressBar();
+    jobProgressBar->setRange(0, 100);
+    jobProgressBar->setValue(0);
+    jobProgressBar->setTextVisible(true);
+
+    runLogList = new QListWidget();
+    runLogList->setStyleSheet("background-color: #ecf0f1; border: 1px solid #bdc3c7;");
+
+    QHBoxLayout* btnLayout = new QHBoxLayout();
+    pauseBtn               = new QPushButton("PAUSE");
+    QPushButton* stopBtn   = new QPushButton("STOP / ABORT");
+
+    pauseBtn->setStyleSheet("background-color: #f39c12; color: white; font-weight: bold; padding: 10px;");
+    stopBtn->setStyleSheet("background-color: #c0392b; color: white; font-weight: bold; padding: 10px;");
+
+    connect(pauseBtn, &QPushButton::clicked, this, &OperatorPage::onPauseClicked);
+    connect(stopBtn, &QPushButton::clicked, this, &OperatorPage::onStopClicked);
+
+    btnLayout->addWidget(pauseBtn);
+    btnLayout->addWidget(stopBtn);
+
+    groupLayout->addWidget(currentTaskLabel);
+    groupLayout->addWidget(jobProgressBar);
+    groupLayout->addWidget(new QLabel("Action Log:"));
+    groupLayout->addWidget(runLogList);
+    groupLayout->addLayout(btnLayout);
+
+    layout->addWidget(runGroup);
+    return page;
+}
+
+QWidget* OperatorPage::createTapeSwapPage()
+{
+    QWidget* page       = new QWidget();
+    QVBoxLayout* layout = new QVBoxLayout(page);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    QGroupBox* swapGroup = new QGroupBox("ATTENTION: Tape Swap Required");
+    swapGroup->setStyleSheet("QGroupBox { border: 2px solid #e74c3c; border-radius: 5px; margin-top: 1ex; } QGroupBox::title { subcontrol-origin: margin; left: 10px; "
+                             "color: #e74c3c; font-weight: bold; }");
+    QVBoxLayout* groupLayout  = new QVBoxLayout(swapGroup);
+
+    tapeSwapInstructionsLabel = new QLabel("Machine Paused.\n\nPlease load component into the feeder.");
+    tapeSwapInstructionsLabel->setWordWrap(true);
+    QFont font = tapeSwapInstructionsLabel->font();
+    font.setPointSize(12);
+    tapeSwapInstructionsLabel->setFont(font);
+
+    QLabel* tipLabel = new QLabel("<i>Tip: Use the jog controls below to fine-tune the tape position so the first component is aligned with the gantry camera.</i>");
+    tipLabel->setWordWrap(true);
+
+    QPushButton* btnConfirmSwap = new QPushButton("Tape Loaded & Aligned - Resume Job");
+    btnConfirmSwap->setStyleSheet("QPushButton { background-color: #2980b9; color: white; font-weight: bold; padding: 15px; border-radius: 5px; } QPushButton:hover { "
+                                  "background-color: #3498db; }");
+
+    connect(btnConfirmSwap, &QPushButton::clicked, this, &OperatorPage::onTapeSwapConfirmed);
+
+    groupLayout->addWidget(tapeSwapInstructionsLabel);
+    groupLayout->addSpacing(15);
+    groupLayout->addWidget(tipLabel);
+    groupLayout->addStretch();
+    groupLayout->addWidget(btnConfirmSwap);
+
+    layout->addWidget(swapGroup);
+    return page;
+}
+
+QGroupBox* OperatorPage::createJogPanel()
+{
+    QGroupBox* group        = new QGroupBox("Manual Jog Controls");
+    QVBoxLayout* mainLayout = new QVBoxLayout(group);
+
+    QHBoxLayout* stepLayout = new QHBoxLayout();
+    stepLayout->addWidget(new QLabel("Step Size (mm):"));
+    jogStepSpinBox = new QDoubleSpinBox();
+    jogStepSpinBox->setRange(0.01, 100.0);
+    jogStepSpinBox->setValue(1.0);
+    jogStepSpinBox->setSingleStep(0.1);
+    stepLayout->addWidget(jogStepSpinBox);
+    stepLayout->addStretch();
+    mainLayout->addLayout(stepLayout);
+
+    QGridLayout* grid = new QGridLayout();
+
+    // Helper lambda to create directional buttons
+    auto createBtn = [this](const QString& text, const QString& axis, double dirMultiplier)
     {
-        m_pGantryCam = std::make_unique<BasicCam>("/dev/v4l/by-id/usb-SunplusIT_Inc_USB_2.0_Camera_20201211V0-video-index0",
-                                                  640,
-                                                  480,
-                                                  30,
-                                                  PIXEL_FORMATS::eBGR,
-                                                  90.0,
-                                                  90.0,
-                                                  false,
-                                                  1);
-        qDebug() << "Camera opened successfully. Starting camera thread...";
-        m_pGantryCam->Start();
-    }
-    catch (...)
+        QPushButton* btn = new QPushButton(text);
+        btn->setMinimumSize(50, 50);
+        connect(btn, &QPushButton::clicked, this, [this, axis, dirMultiplier]() { emit requestJog(axis, jogStepSpinBox->value() * dirMultiplier); });
+        return btn;
+    };
+
+    // Y Axis
+    grid->addWidget(createBtn("Y+", "Y", 1.0), 0, 1);
+    grid->addWidget(createBtn("Y-", "Y", -1.0), 2, 1);
+    // X Axis
+    grid->addWidget(createBtn("X-", "X", -1.0), 1, 0);
+    grid->addWidget(createBtn("X+", "X", 1.0), 1, 2);
+    // Z Axis (Vertical Layout to the side)
+    grid->addWidget(createBtn("Z+ (Up)", "Z", 1.0), 0, 4);
+    grid->addWidget(createBtn("Z- (Dn)", "Z", -1.0), 2, 4);
+    // Rotation Axis
+    grid->addWidget(createBtn("Rot CCW", "A", -1.0), 0, 5);
+    grid->addWidget(createBtn("Rot CW", "A", 1.0), 2, 5);
+
+    // Spacer between XY pad and Z/Rot pad
+    grid->setColumnMinimumWidth(3, 20);
+
+    mainLayout->addLayout(grid);
+    return group;
+}
+
+// --- Public Slots for Backend Integration ---
+
+void OperatorPage::updateCameraFrame(const QImage& image, const QString& activeCameraName)
+{
+    if (!image.isNull())
     {
-        m_pCameraDisplayLabel->setText("Camera Error");
+        cameraFeedLabel->setPixmap(QPixmap::fromImage(image).scaled(cameraFeedLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     }
-
-    // --- Added Timer Setup ---
-    QTimer* updateTimer = new QTimer(this);
-    connect(updateTimer, &QTimer::timeout, this, &operatorPage::updateUIAndCamera);
-    updateTimer->start(33);    // Check for new frames at ~30 FPS
-
-    qDebug() << "operatorPage initialized.";
+    cameraStatusLabel->setText(QString("Active View: %1").arg(activeCameraName));
 }
 
-operatorPage::~operatorPage()
+void OperatorPage::setMachineStateToSetup()
 {
-    if (m_pGantryCam)
+    modeStackedWidget->setCurrentIndex(SetupMode);
+    jogGroupBox->setEnabled(true);
+}
+
+void OperatorPage::setMachineStateToRun()
+{
+    modeStackedWidget->setCurrentIndex(RunMode);
+    jogGroupBox->setEnabled(false);    // Disable jogging during automated run
+    logMessage("Job Started.");
+}
+
+void OperatorPage::updateRunStatus(const QString& currentTask, int progressPercentage)
+{
+    currentTaskLabel->setText(QString("Status: %1").arg(currentTask));
+    jobProgressBar->setValue(progressPercentage);
+    logMessage(currentTask);
+}
+
+void OperatorPage::triggerTapeSwapRequired(const QString& componentName, const QString& packageType)
+{
+    // Switch UI to Tape Swap Mode
+    modeStackedWidget->setCurrentIndex(TapeSwapMode);
+
+    // Enable jogging so the operator can align the new tape visually
+    jogGroupBox->setEnabled(true);
+
+    QString msg = QString("Machine Paused.\n\nPlease remove empty tape and load:\n\nComponent: %1\nPackage: %2").arg(componentName).arg(packageType);
+    tapeSwapInstructionsLabel->setText(msg);
+    logMessage(QString("Tape swap required for %1").arg(componentName));
+}
+
+void OperatorPage::logMessage(const QString& msg)
+{
+    runLogList->addItem(msg);
+    runLogList->scrollToBottom();
+}
+
+// --- Internal Handlers ---
+
+void OperatorPage::onStartClicked()
+{
+    setMachineStateToRun();
+    emit requestStartJob();
+}
+
+void OperatorPage::onPauseClicked()
+{
+    if (pauseBtn->text() == "PAUSE")
     {
-        m_pGantryCam->RequestStop();
-        m_pGantryCam->Join();
+        pauseBtn->setText("RESUME");
+        jogGroupBox->setEnabled(true);    // Allow jog while paused
+        logMessage("Job Paused by operator.");
+        emit requestPauseJob();
     }
-}
-
-// --- User Interaction Hooks ---
-void operatorPage::onHomeClicked()
-{
-    // m_pPnPRunner_instance->CommandHomeMachine();
-}
-
-void operatorPage::onCalibrateClicked()
-{
-    // m_pPnPRunner_instance->CommandCalibrateVision();
-}
-
-void operatorPage::onStartJobClicked()
-{
-    // m_pPnPRunner_instance->CommandStartJob("board/CoreBoard-all-pos.csv");
-}
-
-void operatorPage::onAbortClicked()
-{
-    // m_pPnPRunner_instance->CommandAbort();
-}
-
-void operatorPage::onPauseClicked()
-{
-    // if (m_pPnPRunner_instance->GetCurrentState() == MachineState::RUNNING_JOB)
-    // {
-    //     m_pPnPRunner_instance->CommandPauseJob();
-    // }
-    // else if (m_pPnPRunner_instance->GetCurrentState() == MachineState::PAUSED)
-    // {
-    //     m_pPnPRunner_instance->CommandResumeJob();
-    // }
-}
-
-// --- Main Update Loop ---
-void operatorPage::updateUIAndCamera()
-{
-    // 1. Update UI Status based on PnPRunner State
-    // MachineState currentState = m_pPnPRunner_instance->GetCurrentState();
-
-    // switch (currentState)
-    // {
-    //     case MachineState::DISCONNECTED:
-    //         m_pStateLabel->setText("State: DISCONNECTED");
-    //         m_pStateLabel->setStyleSheet("color: red;");
-    //         break;
-    //     case MachineState::IDLE:
-    //         m_pStateLabel->setText("State: IDLE");
-    //         m_pStateLabel->setStyleSheet("color: green;");
-    //         break;
-    //     case MachineState::HOMING:
-    //         m_pStateLabel->setText("State: HOMING");
-    //         m_pStateLabel->setStyleSheet("color: orange;");
-    //         break;
-    //     case MachineState::VISION_CALIBRATION:
-    //         m_pStateLabel->setText("State: CALIBRATING VISION");
-    //         m_pStateLabel->setStyleSheet("color: orange;");
-    //         break;
-    //     case MachineState::RUNNING_JOB:
-    //         m_pStateLabel->setText("State: RUNNING JOB");
-    //         m_pStateLabel->setStyleSheet("color: blue;");
-    //         break;
-    //     case MachineState::PAUSED:
-    //         m_pStateLabel->setText("State: PAUSED");
-    //         m_pStateLabel->setStyleSheet("color: orange;");
-    //         break;
-    //     case MachineState::ERROR_STATE:
-    //         m_pStateLabel->setText("State: ERROR");
-    //         m_pStateLabel->setStyleSheet("color: red;");
-    //         break;
-    // }
-
-    // // Dynamic Button Toggling
-    // m_pHomeBtn->setEnabled(currentState == MachineState::IDLE || currentState == MachineState::ERROR_STATE);
-    // m_pCalibrateVisionBtn->setEnabled(currentState == MachineState::IDLE);
-    // m_pStartJobBtn->setEnabled(currentState == MachineState::IDLE);
-    // m_pPauseBtn->setEnabled(currentState == MachineState::RUNNING_JOB || currentState == MachineState::PAUSED);
-    // m_pPauseBtn->setText(currentState == MachineState::PAUSED ? "Resume" : "Pause");
-
-    // 2. Update Camera Feed
-    if (!m_pGantryCam || m_pGantryCam->GetThreadState() != Thread<void>::ThreadState::eRunning)
-        return;
-
-    if (!m_frameReadyFuture.valid())
+    else
     {
-        m_frameReadyFuture = m_pGantryCam->RequestFrameCopy(m_currentFrame);
-        return;
-    }
-
-    if (m_frameReadyFuture.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
-    {
-        try
-        {
-            if (m_frameReadyFuture.get() && !m_currentFrame.empty())
-            {
-                cv::Mat displayFrame = m_currentFrame.clone();
-
-                // Run Vision Overlay based on selected mode
-                if (m_eVisionMode == VisionMode::Fiducial)
-                {
-                    auto fiducials = FiducialDetector::DetectFiducials(displayFrame);
-                    for (const auto& pt : fiducials)
-                    {
-                        cv::circle(displayFrame, pt, 15, cv::Scalar(0, 255, 0), 2);
-                        cv::drawMarker(displayFrame, pt, cv::Scalar(0, 0, 255), cv::MARKER_CROSS, 20, 2);
-                    }
-                }
-                else if (m_eVisionMode == VisionMode::Component)
-                {
-                    auto pose = ComponentDetector::DetectComponentPose(displayFrame);
-                    if (pose.bFound)
-                    {
-                        cv::Point2f rect_points[4];
-                        pose.cvBoundingBox.points(rect_points);
-                        for (int j = 0; j < 4; j++)
-                            cv::line(displayFrame, rect_points[j], rect_points[(j + 1) % 4], cv::Scalar(255, 0, 0), 2);
-                        cv::putText(displayFrame,
-                                    "Angle: " + std::to_string(pose.dRotationDegrees),
-                                    cv::Point(20, 40),
-                                    cv::FONT_HERSHEY_SIMPLEX,
-                                    0.8,
-                                    cv::Scalar(0, 255, 255),
-                                    2);
-                    }
-                }
-                else if (m_eVisionMode == VisionMode::Homing)
-                {
-                    CameraConfig mockConfig;
-                    mockConfig.cvK = (cv::Mat_<double>(3, 3) << 800, 0, 320, 0, 800, 240, 0, 0, 1);
-                    mockConfig.cvD = cv::Mat::zeros(4, 1, CV_64F);
-                    VisualHoming::FindHomeMarker(displayFrame, mockConfig, 50.0f, 0, cv::aruco::DICT_4X4_50, &displayFrame);
-                }
-
-                // Push to UI
-                cv::Mat rgbFrame;
-                cv::cvtColor(displayFrame, rgbFrame, cv::COLOR_BGR2RGB);
-                QImage qimg((uchar*) rgbFrame.data, rgbFrame.cols, rgbFrame.rows, rgbFrame.step, QImage::Format_RGB888);
-                m_pCameraDisplayLabel->setPixmap(QPixmap::fromImage(qimg.copy()));
-            }
-        }
-        catch (...)
-        {}
-        m_frameReadyFuture = m_pGantryCam->RequestFrameCopy(m_currentFrame);
+        pauseBtn->setText("PAUSE");
+        jogGroupBox->setEnabled(false);
+        logMessage("Job Resumed.");
+        emit requestStartJob();    // or requestResumeJob() depending on your flow control
     }
 }
 
-void operatorPage::onGCodeSendButtonClicked()
+void OperatorPage::onStopClicked()
 {
-    qDebug("GCode Send Button Clicked");
-    QString gcode = m_pGCodeEntryTextBox->toPlainText();
-    qDebug() << "GCode to send:" << gcode;
+    setMachineStateToSetup();
+    logMessage("Job Stopped/Aborted.");
+    emit requestStopJob();
+}
 
-    // if (this->m_pPnPRunner_instance == nullptr)
-    // {
-    //     qDebug() << "PnPRunner not instantiated.";
-    //     QMessageBox msgBox;
-    //     msgBox.setText("Machine not connected.");
-    //     msgBox.exec();
-    // }
-    // else
-    // {
-    //     if (this->m_pPnPRunner_instance->GetCurrentState() == MachineState::IDLE)
-    //     {
-    //         qDebug() << "PnP is currently IDLE. Sending GCode command.";
-    //         this->m_pPnPRunner_instance->sendGCode(gcode.toStdString());
-    //     }
-    //     else
-    //     {
-    //         qDebug() << "PnP is currently not IDLE. Current state:" << QString::fromStdString(m_pPnPRunner_instance->GetCurrentStateString())
-    //                  << ". GCode command cannot be sent.";
-    //     }
-    // }
+void OperatorPage::onTapeSwapConfirmed()
+{
+    setMachineStateToRun();
+    emit requestTapeSwapConfirmation();
+    logMessage("Tape swap confirmed. Resuming job...");
 }
