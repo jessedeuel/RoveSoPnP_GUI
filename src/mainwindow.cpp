@@ -1,8 +1,11 @@
 #include "mainwindow.h"
 
 #include <QDebug>
+#include <QImage>
 #include <QPlainTextEdit>
 #include <QTextEdit>
+#include <QTimer>
+#include <future>
 #include <regex.h>
 
 #include "Logging.h"
@@ -12,6 +15,7 @@
 #include "operatorPage.h"
 #include "settingsPage.h"
 #include "sideBar.h"
+#include "vision/cameras/BasicCam.h"
 
 // #include "pnpRunner.h"
 
@@ -45,8 +49,64 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     QWidget* centralWidget = new QWidget(this);
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
+https:    // www.ebay.com/mye/myebay/bidsoffers
 
     connect(tabs, &QTabWidget::tabBarClicked, this, &MainWindow::onTabBarClicked);
+
+    // ---------------------------------------------------------
+    // VISION SYSTEM INTEGRATION
+    // ---------------------------------------------------------
+
+    // Initialize the BasicCam (Using std::make_shared to match std::shared_ptr)
+    try
+    {
+        gantryCam = std::make_unique<BasicCam>("/dev/v4l/by-id/usb-8SSC21C16294V1SR34S00CW_Integrated_Camera_200901010001-video-index0",
+                                               640,
+                                               480,
+                                               30,
+                                               PIXEL_FORMATS::eBGR,
+                                               90.0,
+                                               90.0,
+                                               false,
+                                               1);
+        qDebug() << "Camera opened successfully. Starting camera thread...";
+        gantryCam->Start();
+    }
+    catch (...)
+    {
+        qDebug() << "Failed to open camera. Check the camera path and connection.";
+    }
+
+    // Setup a QTimer to act as the camera polling loop
+    cameraTimer = new QTimer(this);
+
+    // Capture 'operatorPage_instance' in the lambda so we can pass the frame to it
+    connect(cameraTimer,
+            &QTimer::timeout,
+            this,
+            [this, operatorPage_instance]()
+            {
+                cv::Mat cvNormalFrame;
+
+                // Request frame from camera
+                std::future<bool> fuCopyStatus = gantryCam->RequestFrameCopy(cvNormalFrame);
+
+                // .get() blocks the main thread very briefly until the frame is ready
+                if (fuCopyStatus.get() && !cvNormalFrame.empty())
+                {
+                    // Convert OpenCV Mat (BGR) to Qt QImage (RGB)
+                    QImage qimg(cvNormalFrame.data, cvNormalFrame.cols, cvNormalFrame.rows, cvNormalFrame.step, QImage::Format_RGB888);
+
+                    // OpenCV defaults to BGR, so we swap it to RGB for Qt rendering
+                    QImage finalImage = qimg.rgbSwapped();
+
+                    // Pass the frame to the Operator Page
+                    operatorPage_instance->updateCameraFrame(finalImage, "Gantry Camera - Live Feed");
+                }
+            });
+
+    // Start timer at roughly 30 FPS (~33ms interval)
+    cameraTimer->start(33);
 
     qDebug() << "MainWindow initialized.";
 }
@@ -54,6 +114,19 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 MainWindow::~MainWindow()
 {
     qDebug() << "Destroying MainWindow...";
+
+    // Stop the timer so it stops requesting frames
+    if (cameraTimer)
+    {
+        cameraTimer->stop();
+    }
+
+    // Safely stop the camera thread before destruction
+    if (gantryCam)
+    {
+        gantryCam->RequestStop();
+        gantryCam->Join();
+    }
 }
 
 void MainWindow::onTabBarClicked(int index)
