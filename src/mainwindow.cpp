@@ -60,7 +60,7 @@ https:    // www.ebay.com/mye/myebay/bidsoffers
     // Initialize the BasicCam (Using std::make_shared to match std::shared_ptr)
     try
     {
-        gantryCam = std::make_unique<BasicCam>("/dev/v4l/by-id/usb-8SSC21C16294V1SR34S00CW_Integrated_Camera_200901010001-video-index0",
+        gantryCam = std::make_unique<BasicCam>("/dev/v4l/by-id/usb-8MP_USB_Camera_8MP_USB_Camera_2022051301-video-index0",
                                                640,
                                                480,
                                                30,
