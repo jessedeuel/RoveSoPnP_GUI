@@ -11,13 +11,12 @@
 #include "Logging.h"
 #include "customMenuBar.h"
 #include "debugPnPTestPage.h"
+#include "flowControl.h"
 #include "jobsPage.h"
 #include "operatorPage.h"
 #include "settingsPage.h"
 #include "sideBar.h"
 #include "vision/cameras/BasicCam.h"
-
-// #include "pnpRunner.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 {
@@ -49,7 +48,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     QWidget* centralWidget = new QWidget(this);
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
-https:    // www.ebay.com/mye/myebay/bidsoffers
 
     connect(tabs, &QTabWidget::tabBarClicked, this, &MainWindow::onTabBarClicked);
 
@@ -60,7 +58,7 @@ https:    // www.ebay.com/mye/myebay/bidsoffers
     // Initialize the BasicCam (Using std::make_shared to match std::shared_ptr)
     try
     {
-        gantryCam = std::make_unique<BasicCam>("/dev/v4l/by-id/usb-8MP_USB_Camera_8MP_USB_Camera_2022051301-video-index0",
+        gantryCam = std::make_shared<BasicCam>("/dev/v4l/by-id/usb-8SSC21C16294V1SR34S00CW_Integrated_Camera_200901010001-video-index0",
                                                640,
                                                480,
                                                30,
@@ -77,36 +75,18 @@ https:    // www.ebay.com/mye/myebay/bidsoffers
         qDebug() << "Failed to open camera. Check the camera path and connection.";
     }
 
-    // Setup a QTimer to act as the camera polling loop
-    cameraTimer = new QTimer(this);
+    // ---------------------------------------------------------
+    // FLOW CONTROL INTEGRATION
+    // ---------------------------------------------------------
 
-    // Capture 'operatorPage_instance' in the lambda so we can pass the frame to it
-    connect(cameraTimer,
-            &QTimer::timeout,
-            this,
-            [this, operatorPage_instance]()
-            {
-                cv::Mat cvNormalFrame;
+    // 1. Initialize FlowControl. We allocate it on the heap so it lives for the app duration.
+    FlowControl* flowControl_instance = new FlowControl(m_pGRBL_instance, gantryCam, nullptr);
 
-                // Request frame from camera
-                std::future<bool> fuCopyStatus = gantryCam->RequestFrameCopy(cvNormalFrame);
+    // 2. Bind the operator page UI directly to the state machine
+    operatorPage_instance->bindFlowControl(flowControl_instance);
 
-                // .get() blocks the main thread very briefly until the frame is ready
-                if (fuCopyStatus.get() && !cvNormalFrame.empty())
-                {
-                    // Convert OpenCV Mat (BGR) to Qt QImage (RGB)
-                    QImage qimg(cvNormalFrame.data, cvNormalFrame.cols, cvNormalFrame.rows, cvNormalFrame.step, QImage::Format_RGB888);
-
-                    // OpenCV defaults to BGR, so we swap it to RGB for Qt rendering
-                    QImage finalImage = qimg.rgbSwapped();
-
-                    // Pass the frame to the Operator Page
-                    operatorPage_instance->updateCameraFrame(finalImage, "Gantry Camera - Live Feed");
-                }
-            });
-
-    // Start timer at roughly 30 FPS (~33ms interval)
-    cameraTimer->start(33);
+    // 3. Bind the sidebar UI directly to the state machine
+    sideBar_instance->bindFlowControl(flowControl_instance);
 
     qDebug() << "MainWindow initialized.";
 }

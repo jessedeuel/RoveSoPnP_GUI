@@ -8,16 +8,18 @@
 
 #include <memory>
 
-// #include "pnpRunner.h"
+class FlowControl;    // Forward declaration
 
 class sideBar : public QWidget
 {
         Q_OBJECT
 
     public:
-        // std::shared_ptr<PnPRunner> pPnPRunner_instance
         sideBar(QWidget* parent = nullptr);
         ~sideBar();
+
+        // Bind the sidebar to FlowControl to receive live updates
+        void bindFlowControl(FlowControl* fc);
 
     private:
         QGridLayout* m_pSideBarLayout;
@@ -29,9 +31,13 @@ class sideBar : public QWidget
         QPushButton* m_pPauseButton;
         QPushButton* m_pStartEndProgramButton;
 
-        // std::shared_ptr<PnPRunner> m_pPnPRunner_instance;
+        FlowControl* m_fc = nullptr;    // Reference to backend
 
     private slots:
         void onPauseButtonClicked();
         void onStartEndProgramButtonClicked();
+
+        // Handlers for incoming live data
+        void updateState(const QString& stateStr);
+        void updatePosition(float x, float y, float z);
 };

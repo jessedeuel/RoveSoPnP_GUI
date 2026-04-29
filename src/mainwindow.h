@@ -44,7 +44,10 @@ class MainWindow : public QMainWindow
         QList<QString> listPorts();
         // Comm m_PNPMachineComm;
         std::shared_ptr<GRBL> m_pGRBL_instance;
-        std::shared_ptr<BasicCamera> gantryCam;
+
+        // FIXED: Changed from BasicCamera to BasicCam to match FlowControl
+        std::shared_ptr<BasicCam> gantryCam;
+
         QTimer* cameraTimer;
 
     private slots:
