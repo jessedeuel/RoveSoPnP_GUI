@@ -45,7 +45,6 @@ class MainWindow : public QMainWindow
         // Comm m_PNPMachineComm;
         std::shared_ptr<GRBL> m_pGRBL_instance;
 
-        // FIXED: Changed from BasicCamera to BasicCam to match FlowControl
         std::shared_ptr<BasicCam> gantryCam;
 
         QTimer* cameraTimer;
