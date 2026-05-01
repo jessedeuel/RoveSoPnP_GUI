@@ -14,6 +14,9 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+// Forward declaration of FlowControl
+class FlowControl;
+
 class OperatorPage : public QWidget
 {
         Q_OBJECT
@@ -21,6 +24,9 @@ class OperatorPage : public QWidget
     public:
         explicit OperatorPage(QWidget* parent = nullptr);
         ~OperatorPage();
+
+        // Easily connect the UI to your FlowControl backend
+        void bindFlowControl(FlowControl* fc);
 
     public slots:
         // --- Interface for Vision Backend ---
@@ -33,7 +39,8 @@ class OperatorPage : public QWidget
         void updateRunStatus(const QString& currentTask, int progressPercentage);
         void logMessage(const QString& msg);
 
-        // Trigger this from flow control when it runs out of tape
+        // Dynamic State Popups triggered by FlowControl
+        void promptFiducialAlignment(int fiducialIndex);
         void triggerTapeSwapRequired(const QString& componentName, const QString& packageType);
 
     signals:
@@ -50,6 +57,7 @@ class OperatorPage : public QWidget
         void onStartClicked();
         void onPauseClicked();
         void onStopClicked();
+        void onDynamicFiducialLocked();
         void onTapeSwapConfirmed();
 
     private:
@@ -59,6 +67,7 @@ class OperatorPage : public QWidget
 
         QWidget* createSetupPage();
         QWidget* createRunPage();
+        QWidget* createFiducialAlignPage();
         QWidget* createTapeSwapPage();
         QGroupBox* createJogPanel();
 
@@ -73,9 +82,10 @@ class OperatorPage : public QWidget
 
         enum ModeIndex
         {
-            SetupMode    = 0,
-            RunMode      = 1,
-            TapeSwapMode = 2
+            SetupMode         = 0,
+            RunMode           = 1,
+            TapeSwapMode      = 2,
+            FiducialAlignMode = 3
         };
 
         // Run Elements
@@ -83,6 +93,10 @@ class OperatorPage : public QWidget
         QProgressBar* jobProgressBar;
         QListWidget* runLogList;
         QPushButton* pauseBtn;
+
+        // Dynamic Fiducial Alignment Elements
+        QLabel* fiducialPromptLabel;
+        QPushButton* btnLockDynamicFiducial;
 
         // Tape Swap Elements
         QLabel* tapeSwapInstructionsLabel;

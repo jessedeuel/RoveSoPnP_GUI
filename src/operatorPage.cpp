@@ -1,4 +1,5 @@
 #include "operatorPage.h"
+#include "flowControl.h"
 #include <QApplication>
 #include <QFont>
 #include <QFrame>
@@ -11,6 +12,27 @@ OperatorPage::OperatorPage(QWidget* parent) : QWidget(parent)
 }
 
 OperatorPage::~OperatorPage() {}
+
+void OperatorPage::bindFlowControl(FlowControl* fc)
+{
+    if (!fc)
+        return;
+
+    // Connect Backend Signals -> UI Slots
+    connect(fc, &FlowControl::requestCameraFrameUpdate, this, &OperatorPage::updateCameraFrame);
+    connect(fc, &FlowControl::sendLogMessage, this, &OperatorPage::logMessage);
+
+    // Listen for backend dynamically requesting the UI to allow a fiducial lock
+    connect(fc, &FlowControl::requestUserFiducialLock, this, &OperatorPage::promptFiducialAlignment);
+
+    // Connect UI Signals -> Backend interactions
+    connect(this, &OperatorPage::requestSetFiducial, fc, [fc](int index) { fc->setUserConfirmsPosition(true); });
+
+    connect(this, &OperatorPage::requestStartJob, fc, &FlowControl::startJob);
+    connect(this, &OperatorPage::requestPauseJob, fc, &FlowControl::pauseJob);
+    connect(this, &OperatorPage::requestStopJob, fc, &FlowControl::stopJob);
+    connect(this, &OperatorPage::requestJog, fc, &FlowControl::jogMachine);
+}
 
 void OperatorPage::setupUI()
 {
@@ -54,9 +76,10 @@ void OperatorPage::createControlPanel(QHBoxLayout* mainLayout)
     QVBoxLayout* controlLayout = new QVBoxLayout();
 
     modeStackedWidget          = new QStackedWidget(this);
-    modeStackedWidget->addWidget(createSetupPage());       // Index 0
-    modeStackedWidget->addWidget(createRunPage());         // Index 1
-    modeStackedWidget->addWidget(createTapeSwapPage());    // Index 2
+    modeStackedWidget->addWidget(createSetupPage());            // Index 0
+    modeStackedWidget->addWidget(createRunPage());              // Index 1
+    modeStackedWidget->addWidget(createTapeSwapPage());         // Index 2
+    modeStackedWidget->addWidget(createFiducialAlignPage());    // Index 3
 
     jogGroupBox = createJogPanel();
 
@@ -73,27 +96,25 @@ QWidget* OperatorPage::createSetupPage()
     QVBoxLayout* layout = new QVBoxLayout(page);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    QGroupBox* setupGroup    = new QGroupBox("Job Setup & Alignment");
+    QGroupBox* setupGroup    = new QGroupBox("Job Ready");
     QVBoxLayout* groupLayout = new QVBoxLayout(setupGroup);
 
-    QLabel* instructionLabel = new QLabel("1. Jog the gantry camera to Fiducial 1 and lock it.\n2. Jog to Fiducial 2 and lock it.\n3. Start the job.");
+    QLabel* instructionLabel = new QLabel("Ensure the board is securely loaded in the tray.\n\nWhen ready, click START JOB. The machine will automatically home, then "
+                                          "prompt you to align the camera for each fiducial marker.");
     instructionLabel->setWordWrap(true);
 
-    QPushButton* btnSetFiducial1 = new QPushButton("Lock Fiducial 1");
-    QPushButton* btnSetFiducial2 = new QPushButton("Lock Fiducial 2");
-    QPushButton* btnStartJob     = new QPushButton("START JOB");
+    QFont font = instructionLabel->font();
+    font.setPointSize(11);
+    instructionLabel->setFont(font);
 
-    btnStartJob->setStyleSheet("QPushButton { background-color: #27ae60; color: white; font-weight: bold; padding: 15px; border-radius: 5px; } QPushButton:hover { "
-                               "background-color: #2ecc71; }");
+    QPushButton* btnStartJob = new QPushButton("START JOB");
+    btnStartJob->setStyleSheet(
+        "QPushButton { background-color: #27ae60; color: white; font-weight: bold; font-size: 16px; padding: 20px; border-radius: 5px; } QPushButton:hover { "
+        "background-color: #2ecc71; }");
 
-    connect(btnSetFiducial1, &QPushButton::clicked, this, [this]() { emit requestSetFiducial(1); });
-    connect(btnSetFiducial2, &QPushButton::clicked, this, [this]() { emit requestSetFiducial(2); });
     connect(btnStartJob, &QPushButton::clicked, this, &OperatorPage::onStartClicked);
 
     groupLayout->addWidget(instructionLabel);
-    groupLayout->addSpacing(10);
-    groupLayout->addWidget(btnSetFiducial1);
-    groupLayout->addWidget(btnSetFiducial2);
     groupLayout->addStretch();
     groupLayout->addWidget(btnStartJob);
 
@@ -145,6 +166,40 @@ QWidget* OperatorPage::createRunPage()
     groupLayout->addLayout(btnLayout);
 
     layout->addWidget(runGroup);
+    return page;
+}
+
+QWidget* OperatorPage::createFiducialAlignPage()
+{
+    QWidget* page       = new QWidget();
+    QVBoxLayout* layout = new QVBoxLayout(page);
+    layout->setContentsMargins(0, 0, 0, 0);
+
+    QGroupBox* alignGroup = new QGroupBox("User Action Required: Vision Alignment");
+    alignGroup->setStyleSheet("QGroupBox { border: 2px solid #8e44ad; border-radius: 5px; margin-top: 1ex; } QGroupBox::title { subcontrol-origin: margin; left: 10px; "
+                              "color: #8e44ad; font-weight: bold; }");
+    QVBoxLayout* groupLayout = new QVBoxLayout(alignGroup);
+
+    fiducialPromptLabel      = new QLabel("Please jog the gantry to center the camera over the target Fiducial.");
+    fiducialPromptLabel->setWordWrap(true);
+
+    QFont font = fiducialPromptLabel->font();
+    font.setPointSize(12);
+    font.setBold(true);
+    fiducialPromptLabel->setFont(font);
+
+    btnLockDynamicFiducial = new QPushButton("Lock Target");
+    btnLockDynamicFiducial->setStyleSheet(
+        "QPushButton { background-color: #8e44ad; color: white; font-weight: bold; font-size: 16px; padding: 15px; border-radius: 5px; } "
+        "QPushButton:hover { background-color: #9b59b6; }");
+
+    connect(btnLockDynamicFiducial, &QPushButton::clicked, this, &OperatorPage::onDynamicFiducialLocked);
+
+    groupLayout->addWidget(fiducialPromptLabel);
+    groupLayout->addStretch();
+    groupLayout->addWidget(btnLockDynamicFiducial);
+
+    layout->addWidget(alignGroup);
     return page;
 }
 
@@ -261,6 +316,17 @@ void OperatorPage::updateRunStatus(const QString& currentTask, int progressPerce
     logMessage(currentTask);
 }
 
+void OperatorPage::promptFiducialAlignment(int fiducialIndex)
+{
+    // The state machine needs help. Unlock the UI and show the prompt.
+    modeStackedWidget->setCurrentIndex(FiducialAlignMode);
+    jogGroupBox->setEnabled(true);
+
+    fiducialPromptLabel->setText(
+        QString("Please jog the gantry to center the camera directly over Fiducial #%1.\n\nWhen you are satisfied with the alignment, press Lock.").arg(fiducialIndex));
+    logMessage(QString("Waiting for operator to align Fiducial #%1...").arg(fiducialIndex));
+}
+
 void OperatorPage::triggerTapeSwapRequired(const QString& componentName, const QString& packageType)
 {
     // Switch UI to Tape Swap Mode
@@ -311,6 +377,16 @@ void OperatorPage::onStopClicked()
     setMachineStateToSetup();
     logMessage("Job Stopped/Aborted.");
     emit requestStopJob();
+}
+
+void OperatorPage::onDynamicFiducialLocked()
+{
+    // Temporarily go back to standard "Run Mode" visual while the machine moves or detects
+    modeStackedWidget->setCurrentIndex(RunMode);
+    jogGroupBox->setEnabled(false);
+
+    // Pass the confirmation to the backend
+    emit requestSetFiducial(0);
 }
 
 void OperatorPage::onTapeSwapConfirmed()

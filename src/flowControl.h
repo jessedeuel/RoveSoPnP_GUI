@@ -1,19 +1,23 @@
 #ifndef GUI_FLOWCONTROL_H
 #define GUI_FLOWCONTROL_H
 
+#include <QImage>
+#include <QObject>
+#include <QString>
+#include <QTimer>
 #include <chrono>
 #include <iostream>
 #include <memory>
 #include <vector>
 
 // --- Low-Level Hardware ---
+#include "../libdeps/RoveSoPnP_FlowControl/include/LED.hpp"
 #include "../libdeps/RoveSoPnP_FlowControl/include/board.hpp"
 #include "../libdeps/RoveSoPnP_FlowControl/include/feeder.hpp"
 #include "../libdeps/RoveSoPnP_FlowControl/include/gantry.hpp"
 #include "../libdeps/RoveSoPnP_FlowControl/include/grbl.hpp"
 #include "../libdeps/RoveSoPnP_FlowControl/include/head.hpp"
 #include "../libdeps/RoveSoPnP_FlowControl/include/tapeLookup.hpp"
-#include "../libdeps/RoveSoPnP_FlowControl/include/LED.hpp"
 
 // --- Vision Library ---
 #include "../libdeps/RoveSoPnP_Vision/src/vision/algorithms/ComponentDetector.hpp"
@@ -78,8 +82,48 @@ enum class FlowState
     MACHINE_IS_STUPID
 };
 
-class FlowControl
+class FlowControl : public QObject
 {
+        Q_OBJECT
+
+    public:
+        FlowControl(std::shared_ptr<GRBL> grbl_instance, std::shared_ptr<BasicCam> gantryCam, std::shared_ptr<BasicCam> upwardCam);
+        ~FlowControl();
+
+        void tickStateMachine();
+        void setState(FlowState state);
+
+        FlowState getState() const { return m_currentState; }
+
+        QString getStateString() const;
+
+        void setUserConfirmsPosition(bool confirmed) { m_userConfirmsPosition = confirmed; }
+
+        void setFeederReady(bool ready) { m_userConfirmsFeederReady = ready; }
+
+        void resumeMachine() { m_userResumesMachine = true; }
+
+        FlowState advanceComponent();
+        void updateComponents(const char* posFile);
+
+    public slots:
+        // --- Machine Control Handlers (Triggered by UI) ---
+        void startJob();
+        void pauseJob();
+        void resumeJob();
+        void stopJob();
+        void jogMachine(const QString& axis, double distance);
+
+    signals:
+        // Signals for OperatorPage & SideBar integration
+        void requestCameraFrameUpdate(const QImage& image, const QString& activeCameraName);
+        void sendLogMessage(const QString& msg);
+        void stateChanged(const QString& stateName);
+        void positionUpdated(float x, float y, float z);
+
+        // Signal to dynamically ask the UI to unlock jog controls and show a lock button
+        void requestUserFiducialLock(int fiducialIndex);
+
     private:
         std::shared_ptr<GRBL> grbl;
         std::unique_ptr<Head> head;
@@ -88,6 +132,9 @@ class FlowControl
         std::unique_ptr<LED> led1;
         std::unique_ptr<LED> led2;
         std::unique_ptr<Components> components;
+
+        // Internal Timer to continuously tick the state machine
+        QTimer* m_tickTimer;
 
         // Vision Components
         std::shared_ptr<BasicCam> m_gantryCam;
@@ -99,6 +146,11 @@ class FlowControl
         // State management
         FlowState m_currentState  = FlowState::IDLE;
         FlowState m_previousState = FlowState::IDLE;
+
+        // Track last reported position to prevent UI spam
+        float m_lastReportedX = -999.0f;
+        float m_lastReportedY = -999.0f;
+        float m_lastReportedZ = -999.0f;
 
         // Timers for dwells
         std::chrono::steady_clock::time_point m_dwellStartTime;
@@ -130,24 +182,8 @@ class FlowControl
         // Helper to process a fiducial state
         void processFiducialDetection(FlowState nextState);
 
-    public:
-        FlowControl(std::shared_ptr<GRBL> grbl_instance, std::shared_ptr<BasicCam> gantryCam, std::shared_ptr<BasicCam> upwardCam);
-        ~FlowControl();
-
-        void tickStateMachine();
-        void setState(FlowState state);
-
-        FlowState getState() const { return m_currentState; }
-
-        void setUserConfirmsPosition(bool confirmed) { m_userConfirmsPosition = confirmed; }
-
-        void setFeederReady(bool ready) { m_userConfirmsFeederReady = ready; }
-
-        void resumeMachine() { m_userResumesMachine = true; }
-
-        FlowState advanceComponent();
-
-        void updateComponents(const char* posFile);
+        // Helper to continuously push frames with vision overlay to the UI while jogging
+        void updateLiveVisionFeed(const QString& cameraName);
 };
 
 #endif    // GUI_FLOWCONTROL_H
