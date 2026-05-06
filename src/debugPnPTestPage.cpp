@@ -270,6 +270,7 @@ void debugPnPTestPage::onLed1OnClicked()
         [this, color]()
         {
             m_led1->setColor(color);
+            m_led1->setBrightness(0.2f);
             m_led1->setOn();
         });
 }
