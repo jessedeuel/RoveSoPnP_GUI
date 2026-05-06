@@ -52,9 +52,20 @@ void jobsPage::onUploadJobButtonClicked()
                 m_pCurrentJobTextEdit->setPlainText(filePath);
             });
 
-    dialog.exec();
+    if (dialog.exec() != QDialog::Accepted)
+    {
+        qDebug() << "Job file selection canceled by user.";
+        return;
+    }
 
     m_sJobFilePath = m_pCurrentJobTextEdit->toPlainText().toStdString();
+
+    if (m_sJobFilePath.empty())
+    {
+        qDebug() << "Job File Path is empty!";
+        return;
+    }
+
     qDebug() << "Job File Path: |" << m_sJobFilePath.c_str() << "|";
 
     // TODO: Update to go through pnp class when components class is integrated
@@ -68,10 +79,9 @@ void jobsPage::onUploadJobButtonClicked()
 
     for (const auto& pair : component_map)
     {
-        // if (m_pJobsTable->rowCount() - 1 >= i)
-        // {
-        //     m_pJobsTable->setRowCount(i);
-        // }
+        // Safety check to ensure we don't access an empty component array leading to a SegFault (.end())
+        if (pair.second.empty())
+            continue;
 
         auto test3                  = pair.second.begin();
         QTableWidgetItem* reference = new QTableWidgetItem(QString::fromStdString(test3->ref));
@@ -81,8 +91,6 @@ void jobsPage::onUploadJobButtonClicked()
 
         qDebug() << i;
         qDebug() << reference->text() << ", " << value->text() << ", " << ID->text() << ", " << package->text();
-        // QTableWidgetItem* item = new QTableWidgetItem("Test");
-        // m_pJobsTable->setItem(0, 0, item);
 
         m_pJobsTable->setItem(i, 0, reference);
         m_pJobsTable->setItem(i, 1, value);

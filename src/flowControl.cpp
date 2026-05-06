@@ -161,7 +161,7 @@ void FlowControl::updateLiveVisionFeed(const QString& cameraName)
 
 void FlowControl::processFiducialDetection(FlowState nextState)
 {
-    if (m_gantryCam->RequestFrameCopy(m_cvCurrentFrame).get())
+    if (m_gantryCam && m_gantryCam->RequestFrameCopy(m_cvCurrentFrame).get())
     {
         auto fiducials = FiducialDetector::DetectFiducials(m_cvCurrentFrame);
 
@@ -302,9 +302,16 @@ void FlowControl::tickStateMachine()
         case FlowState::DETECT_FIDUCIAL_4: processFiducialDetection(FlowState::CALCULATE_BOARD_TRANSFORM); break;
 
         case FlowState::CALCULATE_BOARD_TRANSFORM:
-            components->calculateBoardOffset(m_fiducialWorldCoords);
-            components->printCoords({0, 0, 0});
-            emit sendLogMessage("Successfully calculated Board Transform Matrix.");
+            if (components)
+            {
+                components->calculateBoardOffset(m_fiducialWorldCoords);
+                components->printCoords({0, 0, 0});
+                emit sendLogMessage("Successfully calculated Board Transform Matrix.");
+            }
+            else
+            {
+                emit sendLogMessage("Error: Components not loaded! Cannot calculate transform.");
+            }
             setState(FlowState::FEEDER_SAFE_START_STATE);
             break;
 
@@ -404,7 +411,7 @@ void FlowControl::tickStateMachine()
             break;
 
         case FlowState::DETECT_COMPONENT_POSE:
-            if (m_upwardCam->RequestFrameCopy(m_cvCurrentFrame).get())
+            if (m_upwardCam && m_upwardCam->RequestFrameCopy(m_cvCurrentFrame).get())
             {
                 // Detect pose via upward camera
                 auto pose = ComponentDetector::DetectComponentPose(m_cvCurrentFrame);
@@ -488,7 +495,14 @@ void FlowControl::tickStateMachine()
 
 FlowState FlowControl::advanceComponent()
 {
-    FlowState next_state       = FlowState::IDLE;
+    FlowState next_state = FlowState::IDLE;
+
+    if (!components)
+    {
+        emit sendLogMessage("Error: Components not loaded! Cannot advance component.");
+        return next_state;
+    }
+
     components_status_t status = components->incrementCurrentComponent();
 
     if (status == SAME_CUTTAPE)

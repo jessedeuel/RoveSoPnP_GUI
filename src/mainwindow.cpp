@@ -83,6 +83,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 
     // 1. Initialize FlowControl. We allocate it on the heap so it lives for the app duration.
     FlowControl* flowControl_instance = new FlowControl(m_pGRBL_instance, gantryCam, nullptr);
+    flowControl_instance->setParent(this);    // Added parent pointer to clean memory and stop SIGSEGV upon app exit
 
     // 2. Bind the UI pages directly to the state machine
     operatorPage_instance->bindFlowControl(flowControl_instance);
