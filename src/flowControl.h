@@ -6,6 +6,7 @@
 #include <QString>
 #include <QTimer>
 #include <chrono>
+#include <future>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -87,7 +88,10 @@ class FlowControl : public QObject
         Q_OBJECT
 
     public:
-        FlowControl(std::shared_ptr<GRBL> grbl_instance, std::shared_ptr<BasicCam> gantryCam, std::shared_ptr<BasicCam> upwardCam);
+        FlowControl(std::shared_ptr<GRBL> grbl_instance,
+                    std::shared_ptr<Components> board_instance,
+                    std::shared_ptr<BasicCam> gantryCam,
+                    std::shared_ptr<BasicCam> upwardCam);
         ~FlowControl();
 
         void tickStateMachine();
@@ -104,7 +108,6 @@ class FlowControl : public QObject
         void resumeMachine() { m_userResumesMachine = true; }
 
         FlowState advanceComponent();
-        void updateComponents(const char* posFile);
 
     public slots:
         // --- Machine Control Handlers (Triggered by UI) ---
@@ -131,7 +134,7 @@ class FlowControl : public QObject
         std::unique_ptr<Feeder> feeder;
         std::unique_ptr<LED> led1;
         std::unique_ptr<LED> led2;
-        std::unique_ptr<Components> components;
+        std::shared_ptr<Components> components;
 
         // Internal Timer to continuously tick the state machine
         QTimer* m_tickTimer;
