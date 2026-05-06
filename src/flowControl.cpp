@@ -126,11 +126,23 @@ void FlowControl::stopJob()
 
 void FlowControl::jogMachine(const QString& axis, double distance)
 {
-    // Typical GRBL Relative Jog command string. e.g., $J=G91 X1.0 F1000
-    QString jogCmd = QString("$J=G91 %1%2 F1000\n").arg(axis).arg(distance);
+    if (!grbl)
+        return;
 
-    // NOTE: Uncomment / replace this depending on your GRBL wrapper method names!
-    // grbl->send(jogCmd.toStdString());
+    // We MUST use Relative Positioning for manual jogging.
+    // Reading getGlobalPosition() and sending an Absolute move (G90) causes a runaway crash
+    // if the position data is stale (e.g., reading 0,0) or in the wrong coordinate frame.
+
+    if (axis == "A" && head)
+    {
+        head->increment(distance);
+    }
+    else
+    {
+        // $J is GRBL's dedicated jog mode. G91 ensures relative moves. F2000 is the rapid feedrate.
+        QString jogCmd = QString("$J=G91 %1%2 F2000\n").arg(axis).arg(distance);
+        grbl->sendCommand(jogCmd.toStdString());
+    }
 
     emit sendLogMessage(QString("Jogged %1 by %2 mm").arg(axis).arg(distance));
 }
@@ -191,12 +203,30 @@ void FlowControl::processFiducialDetection(FlowState nextState)
     setState(nextState);
 }
 
+bool FlowControl::isMachineBusy()
+{
+    if (!grbl)
+        return false;
+
+    auto now = std::chrono::steady_clock::now();
+    // Throttle busy checks to 10 Hz (100ms) to prevent serial spam
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastBusyPollTime).count() >= 100)
+    {
+        m_lastBusyPollTime = now;
+        m_cachedBusyState  = grbl->isBusy();
+    }
+    return m_cachedBusyState;
+}
+
 void FlowControl::tickStateMachine()
 {
-    // 1. Check for position updates and push to UI if changed
-    if (gantry)
+    auto now = std::chrono::steady_clock::now();
+
+    // 1. Check for position updates and push to UI if changed (Throttled to 5 Hz / 200ms)
+    if (gantry && std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastPositionPollTime).count() >= 200)
     {
-        grbl_position_t pos = gantry->getGlobalPosition();
+        m_lastPositionPollTime = now;
+        grbl_position_t pos    = gantry->getGlobalPosition();
         if (pos.x != m_lastReportedX || pos.y != m_lastReportedY || pos.z != m_lastReportedZ)
         {
             m_lastReportedX = pos.x;
@@ -232,12 +262,16 @@ void FlowControl::tickStateMachine()
             break;
 
         case FlowState::CALIBRATION_HOMING:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
+            {
+                // Machine has finished homing. Safe to set Work Coordinates to 0 without dropping the command.
+                grbl->sendCommand("G92 X0 Y0 Z0\n");
                 setState(FlowState::MOVE_Z_SAFE_CALIBRATION);
+            }
             break;
 
         case FlowState::MOVE_Z_SAFE_CALIBRATION:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
             {
                 gantry->setHeadHeight(SAFE_Z_HEIGHT);
                 m_userConfirmsPosition = false;
@@ -347,14 +381,18 @@ void FlowControl::tickStateMachine()
             break;
 
         case FlowState::PNP_HOMING:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
+            {
+                // Machine has finished homing. Safe to set Work Coordinates to 0 without dropping the command.
+                grbl->sendCommand("G92 X0 Y0 Z0\n");
                 setState(FlowState::PICKUP_SAFE_START_STATE);
+            }
             break;
 
         case FlowState::PICKUP_SAFE_START_STATE: setState(FlowState::MOVE_Z_SAFE_PICK); break;
 
         case FlowState::MOVE_Z_SAFE_PICK:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
             {
                 gantry->setHeadHeight(SAFE_Z_HEIGHT);
                 setState(FlowState::MOVE_XY_TO_FEEDER);
@@ -362,7 +400,7 @@ void FlowControl::tickStateMachine()
             break;
 
         case FlowState::MOVE_XY_TO_FEEDER:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
             {
                 gantry->setGlobalPosition(current_component.feeder_x, current_component.feeder_y);
                 setState(FlowState::LOWER_Z_TO_PICK);
@@ -370,7 +408,7 @@ void FlowControl::tickStateMachine()
             break;
 
         case FlowState::LOWER_Z_TO_PICK:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
             {
                 gantry->setHeadHeight(current_component.pickup_z);
                 setState(FlowState::ENABLE_VACUUM);
@@ -385,15 +423,15 @@ void FlowControl::tickStateMachine()
 
         case FlowState::DWELL_FOR_VACUUM:
         {
-            auto now     = std::chrono::steady_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_dwellStartTime).count();
+            auto now_dwell = std::chrono::steady_clock::now();
+            auto elapsed   = std::chrono::duration_cast<std::chrono::milliseconds>(now_dwell - m_dwellStartTime).count();
             if (elapsed > DWELL_TIME_MS)
                 setState(FlowState::RAISE_Z_FROM_PICK);
         }
         break;
 
         case FlowState::RAISE_Z_FROM_PICK:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
             {
                 gantry->setHeadHeight(SAFE_Z_HEIGHT);
                 setState(FlowState::PLACE_DETECT_SAFE_START_STATE);
@@ -403,7 +441,7 @@ void FlowControl::tickStateMachine()
         case FlowState::PLACE_DETECT_SAFE_START_STATE: setState(FlowState::MOVE_XY_TO_UPWARD_CAMERA); break;
 
         case FlowState::MOVE_XY_TO_UPWARD_CAMERA:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
             {
                 // gantry->setGlobalPosition(UPWARD_CAM_X, UPWARD_CAM_Y);
                 setState(FlowState::DETECT_COMPONENT_POSE);
@@ -433,12 +471,12 @@ void FlowControl::tickStateMachine()
             break;
 
         case FlowState::MOVING_TO_CORRECTED_POSITION:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
                 setState(FlowState::ROTATE_HEAD_A_AXIS);
             break;
 
         case FlowState::ROTATE_HEAD_A_AXIS:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
             {
                 // head->increment(m_correctedPlaceAngle);
                 setState(FlowState::LOWER_Z_TO_DROP);
@@ -446,7 +484,7 @@ void FlowControl::tickStateMachine()
             break;
 
         case FlowState::LOWER_Z_TO_DROP:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
             {
                 gantry->setHeadHeight(current_component.place_z);
                 setState(FlowState::DISABLE_VACUUM);
@@ -461,15 +499,15 @@ void FlowControl::tickStateMachine()
 
         case FlowState::DWELL_FOR_RELEASE:
         {
-            auto now     = std::chrono::steady_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_dwellStartTime).count();
+            auto now_dwell = std::chrono::steady_clock::now();
+            auto elapsed   = std::chrono::duration_cast<std::chrono::milliseconds>(now_dwell - m_dwellStartTime).count();
             if (elapsed > DWELL_TIME_MS)
                 setState(FlowState::RAISE_Z_FROM_DROP);
         }
         break;
 
         case FlowState::RAISE_Z_FROM_DROP:
-            if (!grbl->isBusy())
+            if (!isMachineBusy())
             {
                 gantry->setHeadHeight(SAFE_Z_HEIGHT);
                 setState(FlowState::GET_NEXT_COMPONENT);

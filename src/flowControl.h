@@ -155,6 +155,11 @@ class FlowControl : public QObject
         // Timers for dwells
         std::chrono::steady_clock::time_point m_dwellStartTime;
 
+        // Timers for hardware polling
+        std::chrono::steady_clock::time_point m_lastPositionPollTime;
+        std::chrono::steady_clock::time_point m_lastBusyPollTime;
+        bool m_cachedBusyState = false;
+
         // Job Data
         struct ComponentData
         {
@@ -178,6 +183,9 @@ class FlowControl : public QObject
         bool m_userConfirmsPosition    = false;
         bool m_userConfirmsFeederReady = false;
         bool m_userResumesMachine      = false;
+
+        // Throttled busy check to prevent serial spam
+        bool isMachineBusy();
 
         // Helper to process a fiducial state
         void processFiducialDetection(FlowState nextState);

@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     // ---------------------------------------------------------
     try
     {
-        gantryCam = std::make_shared<BasicCam>("/dev/v4l/by-id/usb-8SSC21C16294V1SR34S00CW_Integrated_Camera_200901010001-video-index0",
+        gantryCam = std::make_shared<BasicCam>("/dev/v4l/by-id/usb-8MP_USB_Camera_8MP_USB_Camera_2022051301-video-index0",
                                                640,
                                                480,
                                                30,

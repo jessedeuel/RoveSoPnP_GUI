@@ -73,7 +73,7 @@ debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) 
     QGroupBox* feederGroup    = new QGroupBox("Feeder", this);
     QHBoxLayout* feederLayout = new QHBoxLayout(feederGroup);
     m_pFeederLengthSpin       = new QDoubleSpinBox(this);
-    m_pFeederLengthSpin->setRange(0, 500);
+    m_pFeederLengthSpin->setRange(-500, 500);
     m_pFeedBtn = new QPushButton("Feed Length", this);
     feederLayout->addWidget(new QLabel("Length:"));
     feederLayout->addWidget(m_pFeederLengthSpin);
@@ -203,6 +203,7 @@ void debugPnPTestPage::onMoveZClicked()
 void debugPnPTestPage::onHomeGantryClicked()
 {
     executeHardwareTask([this]() { m_gantry->home(); });
+    executeHardwareTask([this]() { m_grbl->sendCommand("G92 X0 Y0 Z0\n"); });
 }
 
 void debugPnPTestPage::onUnlockClicked()
@@ -270,6 +271,7 @@ void debugPnPTestPage::onLed1OnClicked()
         [this, color]()
         {
             m_led1->setColor(color);
+            m_led1->setBrightness(0.2);
             m_led1->setOn();
         });
 }
