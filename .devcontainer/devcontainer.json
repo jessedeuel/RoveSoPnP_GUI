@@ -82,7 +82,7 @@
             "settings": {
                 // VSCode settings.
                 "editor.acceptSuggestionOnEnter": "off",
-                "editor.formatOnPaste": true,
+                "editor.formatOnPaste": false,
                 "editor.formatOnSave": true,
                 "editor.formatOnSaveMode": "file",
                 "editor.formatOnType": true,
