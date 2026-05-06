@@ -1,15 +1,19 @@
 #include "flowControl.h"
 
-FlowControl::FlowControl(std::shared_ptr<GRBL> grbl_instance, std::shared_ptr<BasicCam> gantryCam, std::shared_ptr<BasicCam> upwardCam) :
+FlowControl::FlowControl(std::shared_ptr<GRBL> grbl_instance,
+                         std::shared_ptr<Components> board_instance,
+                         std::shared_ptr<BasicCam> gantryCam,
+                         std::shared_ptr<BasicCam> upwardCam) :
     QObject(nullptr),    // Inherit QObject parent safely
     m_gantryCam(gantryCam), m_upwardCam(upwardCam)
 {
-    grbl   = grbl_instance;
-    head   = std::make_unique<Head>(grbl);
-    gantry = std::make_unique<Gantry>(grbl);
-    feeder = std::make_unique<Feeder>(grbl);
-    led1   = std::make_unique<LED>(grbl);
-    led2   = std::make_unique<LED>(grbl);
+    grbl       = grbl_instance;
+    components = board_instance;
+    head       = std::make_unique<Head>(grbl);
+    gantry     = std::make_unique<Gantry>(grbl);
+    feeder     = std::make_unique<Feeder>(grbl);
+    led1       = std::make_unique<LED>(grbl);
+    led2       = std::make_unique<LED>(grbl);
 
     // TODO: Initialize m_gantryCamConfig here with real calibration data
 
@@ -151,24 +155,24 @@ void FlowControl::jogMachine(const QString& axis, double distance)
 
 void FlowControl::updateLiveVisionFeed(const QString& cameraName)
 {
-    if (m_gantryCam && m_gantryCam->RequestFrameCopy(m_cvCurrentFrame).get())
-    {
-        if (!m_cvCurrentFrame.empty())
-        {
-            auto fiducials = FiducialDetector::DetectFiducials(m_cvCurrentFrame);
-            for (const auto& fid : fiducials)
-            {
-                cv::drawMarker(m_cvCurrentFrame, fid, cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 20, 2);
-                cv::circle(m_cvCurrentFrame, fid, 15, cv::Scalar(0, 255, 0), 2);
-            }
+    // if (m_gantryCam && m_gantryCam->RequestFrameCopy(m_cvCurrentFrame).get())
+    // {
+    //     if (!m_cvCurrentFrame.empty())
+    //     {
+    //         auto fiducials = FiducialDetector::DetectFiducials(m_cvCurrentFrame);
+    //         for (const auto& fid : fiducials)
+    //         {
+    //             cv::drawMarker(m_cvCurrentFrame, fid, cv::Scalar(0, 255, 0), cv::MARKER_CROSS, 20, 2);
+    //             cv::circle(m_cvCurrentFrame, fid, 15, cv::Scalar(0, 255, 0), 2);
+    //         }
 
-            cv::Mat rgb;
-            cv::cvtColor(m_cvCurrentFrame, rgb, cv::COLOR_BGR2RGB);
-            QImage img(rgb.data, rgb.cols, rgb.rows, rgb.step, QImage::Format_RGB888);
+    //         cv::Mat rgb;
+    //         cv::cvtColor(m_cvCurrentFrame, rgb, cv::COLOR_BGR2RGB);
+    //         QImage img(rgb.data, rgb.cols, rgb.rows, rgb.step, QImage::Format_RGB888);
 
-            emit requestCameraFrameUpdate(img.copy(), cameraName);
-        }
-    }
+    //         emit requestCameraFrameUpdate(img.copy(), cameraName);
+    //     }
+    // }
 }
 
 void FlowControl::processFiducialDetection(FlowState nextState)
@@ -541,23 +545,18 @@ FlowState FlowControl::advanceComponent()
         return next_state;
     }
 
-    components_status_t status = components->incrementCurrentComponent();
+    Components::components_status_t status = components->incrementCurrentComponent();
 
-    if (status == SAME_CUTTAPE)
+    if (status == Components::SAME_CUTTAPE)
     {
         // Feed next component
         // Tell Feeder to step forward
         next_state = FlowState::PICKUP_SAFE_START_STATE;
     }
-    else if (status == CHANGE_CUTTAPE)
+    else if (status == Components::CHANGE_CUTTAPE)
         next_state = FlowState::FEEDER_SAFE_START_STATE;
-    else if (status == FINAL_CUTTAPE)
+    else if (status == Components::FINAL_CUTTAPE)
         next_state = FlowState::IDLE;
 
     return next_state;
-}
-
-void FlowControl::updateComponents(const char* posFile)
-{
-    components = std::make_unique<Components>(posFile);
 }

@@ -18,6 +18,7 @@
 
 // #include "comm.hpp"
 //  #include "pnpRunner.h"
+#include "board.hpp"
 
 QT_BEGIN_NAMESPACE
 
@@ -44,6 +45,7 @@ class MainWindow : public QMainWindow
         QList<QString> listPorts();
         // Comm m_PNPMachineComm;
         std::shared_ptr<GRBL> m_pGRBL_instance;
+        std::shared_ptr<Components> m_pBoard_instance;
 
         std::shared_ptr<BasicCam> gantryCam;
 

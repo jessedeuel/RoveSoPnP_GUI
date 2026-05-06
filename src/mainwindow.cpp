@@ -28,7 +28,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     customMenuBar* menuBar_instance = new customMenuBar(this);
     this->setMenuBar(menuBar_instance);
 
-    m_pGRBL_instance = std::make_shared<GRBL>();
+    m_pGRBL_instance  = std::make_shared<GRBL>();
+    m_pBoard_instance = std::make_shared<Components>();
 
     // ---------------------------------------------------------
     // VISION SYSTEM INTEGRATION (Must happen before UI classes that need it)
@@ -54,7 +55,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 
     // Initialize UI Pages
     sideBar* sideBar_instance                 = new sideBar(this);
-    jobsPage* jobsPage_instance               = new jobsPage(this);
+    jobsPage* jobsPage_instance               = new jobsPage(m_pBoard_instance, this);
     OperatorPage* operatorPage_instance       = new OperatorPage(this);
     settingsPage* settingsPage_instance       = new settingsPage(m_pGRBL_instance, this);
     debugPnPTestPage* debugPage_instance      = new debugPnPTestPage(m_pGRBL_instance, this);
@@ -82,7 +83,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     // ---------------------------------------------------------
 
     // 1. Initialize FlowControl. We allocate it on the heap so it lives for the app duration.
-    FlowControl* flowControl_instance = new FlowControl(m_pGRBL_instance, gantryCam, nullptr);
+    FlowControl* flowControl_instance = new FlowControl(m_pGRBL_instance, m_pBoard_instance, gantryCam, nullptr);
     flowControl_instance->setParent(this);    // Added parent pointer to clean memory and stop SIGSEGV upon app exit
 
     // 2. Bind the UI pages directly to the state machine

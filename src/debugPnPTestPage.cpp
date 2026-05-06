@@ -136,7 +136,7 @@ debugPnPTestPage::debugPnPTestPage(std::shared_ptr<GRBL> grbl, QWidget* parent) 
         m_feeder       = std::make_unique<Feeder>(m_grbl);
         m_led1         = std::make_unique<LED>(m_grbl);
         m_led2         = std::make_unique<LED>(m_grbl);
-        m_pFlowControl = std::make_unique<FlowControl>(m_grbl, nullptr, nullptr);
+        m_pFlowControl = std::make_unique<FlowControl>(m_grbl, nullptr, nullptr, nullptr);
 
         m_grbl->setLogCallback(
             [this](const std::string& dir, const std::string& msg)
@@ -271,7 +271,7 @@ void debugPnPTestPage::onLed1OnClicked()
         [this, color]()
         {
             m_led1->setColor(color);
-            m_led1->setBrightness(0.2);
+            m_led1->setBrightness(0.2f);
             m_led1->setOn();
         });
 }
